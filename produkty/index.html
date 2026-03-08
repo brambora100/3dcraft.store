@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produkty | 3DCRAFT.STORE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #5266eb;
+            --text-light: #ffffff;
+            --text-dark: #0f172a;
+            --bg-footer: #0a0f1d;
+            --bg-soft: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #000; color: var(--text-dark); overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* --- HORNÍ NAVIGAČNÍ CENTRUM --- */
+        header { 
+            position: fixed; top: 20px; left: 0; right: 0; 
+            display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
+        }
+
+        nav { 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            padding: 8px 12px; border-radius: 24px; 
+            display: flex; align-items: center; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .nav-logo { padding: 0 15px; text-decoration: none; font-weight: 800; color: white; font-size: 1.1rem; }
+        .nav-logo span { color: var(--primary); }
+        .nav-group { display: flex; gap: 4px; }
+        
+        .nav-link { 
+            color: rgba(255, 255, 255, 0.7); 
+            text-decoration: none; font-size: 0.85rem; font-weight: 700; 
+            padding: 10px 16px; border-radius: 16px; 
+            transition: 0.3s; 
+        }
+        .nav-link:hover { color: white; background: rgba(255, 255, 255, 0.08); }
+        .nav-link.active { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .btn-poptavka { 
+            background: var(--primary); color: white; 
+            padding: 10px 20px; border-radius: 16px; 
+            text-decoration: none; font-size: 0.85rem; font-weight: 800;
+            margin-left: 8px; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(82, 102, 235, 0.2);
+        }
+        .btn-poptavka:hover { transform: translateY(-2px); background: #6375f0; }
+        .nav-sep { width: 1px; height: 24px; background: rgba(255, 255, 255, 0.15); margin: 0 12px; }
+
+        /* --- HERO SEKCE (KRATŠÍ - 40vh) --- */
+        .hero { 
+            height: 40vh; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: white; 
+            overflow: hidden;
+        }
+        #bg-video { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; transform: translate(-50%, -50%); object-fit: cover; z-index: -1; filter: brightness(0.5); }
+        .hero-content { text-align: center; z-index: 10; }
+        .hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; letter-spacing: -2px; }
+
+        /* --- BÍLÁ SEKCE S PRODUKTY --- */
+        .white-section { background: white; padding: 80px 0; position: relative; z-index: 20; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
+
+        .product-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 30px; 
+        }
+
+        .product-card {
+            background: var(--bg-soft);
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); border-color: var(--primary); }
+
+        .product-img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-info { padding: 30px; }
+        .product-info h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; }
+        .product-info p { font-size: 0.9rem; color: #64748b; line-height: 1.6; }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(82, 102, 235, 0.1);
+            color: var(--primary);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        /* --- FOOTER --- */
+        footer { background: var(--bg-footer); color: rgba(255, 255, 255, 0.4); padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .footer-links { display: flex; gap: 30px; list-style: none; }
+        .footer-links a { color: rgba(255, 255, 255, 0.4); text-decoration: none; transition: 0.2s; }
+        .footer-links a:hover { color: white; }
+
+        @media (max-width: 1050px) {
+            .nav-link { padding: 10px 12px; font-size: 0.8rem; }
+            header { top: 10px; }
+            .hero { height: 35vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header data-aos="fade-down">
+        <nav>
+            <a href="/3dcraft.store/index" class="nav-logo">3DCRAFT<span>.STORE</span></a>
+            <div class="nav-sep"></div>
+            <div class="nav-group">
+                <a href="/3dcraft.store/index" class="nav-link">Domů</a>
+                <a href="/3dcraft.store/produkty" class="nav-link active">Produkty</a>
+                <a href="/3dcraft.store/kalkulacka" class="nav-link">Kalkulačka</a>
+                <a href="/3dcraft.store/kontakt" class="nav-link">Kontakt</a>
+            </div>
+            <div class="nav-sep"></div>
+            <a href="/3dcraft.store/poptavka" class="btn-poptavka">Nezávazná Poptávka</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="https://portal.bblmw.com/a1/v/a1-bb607a6f1ee73.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content">
+            <h1 data-aos="zoom-in">Naše Produkty</h1>
+        </div>
+    </section>
+
+    <main class="white-section">
+        <div class="container">
+            <div class="product-grid">
+
+                <article class="product-card" data-aos="fade-up">
+                    <img src="https://rpishop.cz/wp-content/uploads/2023/05/28984-Sada-tistenych-dilu-pro-3D-tiskarnu-Voron-2.4-R2-zakladni.jpg" alt="Technické díly" class="product-img">
+                    <div class="product-info">
+                        <span class="badge">Průmysl</span>
+                        <h3>Technické díly</h3>
+                        <p>Mechanické komponenty s vysokou přesností a odolností pro každodenní nasazení a funkční stroje.</p>
+                    </div>
+                </article>
+
+                <article class="product-card" data-aos="fade-up" data-aos-delay="100">
+                    <img src="https://spcdn.shortpixel.ai/spio/ret_img,q_cdnize,to_webp,s_webp/3dtisk.pro/wp-content/uploads/2023/03/sls-3d-tisk-03.jpg" alt="Prototyping" class="product-img">
+                    <div class="product-info">
+                        <span class="badge">Prototypy</span>
+                        <h3>Iterační vývoj</h3>
+                        <p>Rychlé zhmotnění vašich CAD návrhů pro testování ergonomie a funkčnosti před sériovou výrobou.</p>
+                    </div>
+                </article>
+
+                <article class="product-card" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://cdn.muni.cz/media/3647599/mmu3_print_prusa_astronaut.jpg" alt="Vícebarevný tisk" class="product-img">
+                    <div class="product-info">
+                        <span class="badge">Design</span>
+                        <h3>Vícebarevný tisk</h3>
+                        <p>Estetické a reklamní předměty tištěné v barvách dle vašeho přání díky pokročilé AMS technologii.</p>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>&copy; 2026 3DCRAFT.STORE. Všechna práva vyhrazena.</div>
+                <ul class="footer-links">
+                    <li><a href="/3dcraft.store/obchodni-podminky">Obchodní podmínky</a></li>
+                    <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
+                    <li><a href="/3dcraft.store/cookies">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+    </script>
+</body>
+</html>
