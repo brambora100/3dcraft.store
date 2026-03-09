@@ -8,10 +8,12 @@
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 380px; width: 90%; }
-        .btn { background: #6366f1; color: white; border: none; padding: 18px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn:hover { background: #4f46e5; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
+        .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
+        .btn { background: #6366f1; color: white; border: none; padding: 18px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; font-size: 16px; text-transform: uppercase; }
+        .btn:hover { background: #4f46e5; transform: translateY(-3px); }
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
         #status { margin-top: 25px; font-size: 15px; color: #64748b; line-height: 1.6; }
+        .warning { color: #e11d48; font-size: 13px; margin-top: 15px; font-weight: 600; display: block; }
         .logo { font-size: 28px; font-weight: 800; margin-bottom: 10px; color: #1e1b4b; }
         .logo span { color: #6366f1; }
     </style>
@@ -19,14 +21,17 @@
 <body>
     <div class="card">
         <div class="logo">3D<span>CRAFT</span></div>
-        <p style="color:#64748b; margin-bottom: 30px; font-weight: 500;">Vyberte si prosím výdejní místo Zásilkovny pro doručení Vašeho modelu.</p>
+        <p style="color:#64748b; margin-bottom: 20px; font-weight: 500;">Vyberte si prosím výdejní místo Zásilkovny.</p>
+        
         <button id="main-btn" class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
+        <small id="warn-text" class="warning">⚠️ Pozor: Výběr je finální a nelze jej později změnit!</small>
+        
         <div id="status"></div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
@@ -38,20 +43,41 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const orderId = new URLSearchParams(window.location.search).get('id');
+    const statusDiv = document.getElementById('status');
+    const mainBtn = document.getElementById('main-btn');
+    const warnText = document.getElementById('warn-text');
+
+    // Kontrola při načtení: Už zákazník vybral?
+    async function checkStatus() {
+        if (!orderId) {
+            statusDiv.innerHTML = "❌ Neplatný odkaz (chybí ID).";
+            mainBtn.disabled = true;
+            return;
+        }
+        
+        const docSnap = await getDoc(doc(db, "objednavky", orderId));
+        if (docSnap.exists() && docSnap.data().pobocka) {
+            mainBtn.style.display = 'none';
+            warnText.style.display = 'none';
+            statusDiv.innerHTML = `<div style="color:#22c55e; font-weight:800; font-size:18px;">✅ DOPRAVA JIŽ BYLA VYBRÁNA</div>
+                                   <div style="margin-top:10px;">Pobočka: <b>${docSnap.data().pobocka}</b><br>Změna již není možná.</div>`;
+        }
+    }
+    checkStatus();
 
     window.openMap = () => {
-        if (!orderId) { alert("Chybí ID zakázky."); return; }
-
+        // Druhé varování přímo v mapě
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
-                const statusDiv = document.getElementById('status');
-                const mainBtn = document.getElementById('main-btn');
+                const confirmChoice = confirm(`Opravdu chcete doručit balíček na pobočku: ${point.name}?\n\nPo potvrzení již nebude možné místo změnit.`);
                 
+                if (!confirmChoice) return;
+
                 statusDiv.innerHTML = "⌛ <b>Ukládám výběr...</b>";
                 mainBtn.style.display = 'none';
+                warnText.style.display = 'none';
 
                 try {
-                    // Aktualizujeme data v Firebase u té konkrétní objednávky
                     await updateDoc(doc(db, "objednavky", orderId), {
                         pobocka: point.name,
                         pobocka_adresa: point.street + ", " + point.city,
@@ -59,7 +85,7 @@
                     });
                     
                     statusDiv.innerHTML = `<div style="color:#22c55e; font-weight:800; font-size:18px; margin-top:10px;">✅ ÚSPĚŠNĚ ULOŽENO!</div>
-                        <div style="margin-top:10px;">Pobočka: <b>${point.name}</b><br>Nyní můžete toto okno zavřít a odpovědět na e-mail.</div>`;
+                        <div style="margin-top:10px;">Pobočka: <b>${point.name}</b><br>Tento výběr je nyní v systému uzamčen.</div>`;
                 } catch (e) {
                     statusDiv.innerHTML = `<div style="color:#ef4444;">❌ Chyba: ${e.message}</div>`;
                     mainBtn.style.display = 'block';
