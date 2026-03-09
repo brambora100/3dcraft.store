@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookies | 3DCRAFT.STORE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #ffffff;
+            --bg-soft: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- UNIFIKOVANÝ NAVBAR --- */
+        header { 
+            position: fixed; top: 20px; left: 0; right: 0; 
+            display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
+        }
+
+        nav { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 10px 14px; border-radius: 24px; 
+            display: flex; align-items: center; 
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: fit-content;
+        }
+
+        .nav-logo { padding: 0 15px; text-decoration: none; font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
+        .nav-logo span { color: var(--primary); }
+        .nav-group { display: flex; gap: 4px; align-items: center; }
+        .nav-link { 
+            color: var(--text-muted); 
+            text-decoration: none; font-size: 0.85rem; font-weight: 700; 
+            padding: 10px 16px; border-radius: 14px; 
+            transition: 0.3s; 
+        }
+        .nav-link:hover { color: var(--primary); background: var(--bg-soft); }
+        .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
+
+        .btn-poptavka { 
+            background: var(--primary); color: white; 
+            padding: 10px 22px; border-radius: 14px; 
+            text-decoration: none; font-size: 0.85rem; font-weight: 800;
+            margin-left: 8px; transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; }
+        .mobile-toggle span { width: 22px; height: 2px; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
+
+        /* --- CONTENT --- */
+        .legal-section { padding: 140px 0 80px; flex: 1; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 25px; }
+        
+        .legal-card {
+            background: white;
+            padding: 60px;
+            border-radius: 40px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.02);
+        }
+
+        .badge {
+            background: #f1f5ff;
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 10px; }
+        h1 span { color: var(--primary); }
+        h2 { margin: 40px 0 20px; font-size: 1.4rem; font-weight: 800; color: var(--text-main); border-left: 4px solid var(--primary); padding-left: 15px; }
+        p { margin-bottom: 20px; color: var(--text-muted); line-height: 1.8; }
+        strong { color: var(--text-main); }
+
+        /* --- FOOTER --- */
+        footer { padding: 40px 0; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-muted); }
+        .footer-links { list-style: none; display: flex; gap: 24px; }
+        .footer-links a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 600; }
+        .footer-links a:hover { color: var(--primary); }
+
+        @media (max-width: 900px) {
+            header { top: 0; padding: 0; }
+            nav { width: 100%; border-radius: 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); justify-content: space-between; padding: 15px 20px; }
+            .nav-sep { display: none; }
+            .mobile-toggle { display: flex; }
+            .nav-group {
+                position: fixed; top: 70px; left: 0; right: 0;
+                background: white; flex-direction: column;
+                padding: 30px; gap: 15px;
+                transform: translateY(-150%);
+                transition: 0.4s ease-in-out;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            }
+            .nav-group.active { transform: translateY(0); }
+            .legal-card { padding: 30px; border-radius: 30px; }
+            h1 { font-size: 2rem; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header> 
+        <nav>
+            <a href="/3dcraft.store/" class="nav-logo">3DCRAFT<span>.STORE</span></a>
+            <div class="mobile-toggle" id="mobile-menu">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="nav-group" id="nav-group">
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/" class="nav-link">Domů</a>
+                <a href="/3dcraft.store/produkty" class="nav-link">Produkty</a>
+                <a href="/3dcraft.store/kalkulacka" class="nav-link">Kalkulačka</a>
+                <a href="/3dcraft.store/kontakt" class="nav-link">Kontakt</a>
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/poptavka" class="btn-poptavka">Nezávazná Poptávka</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="legal-section">
+        <div class="container">
+            <div class="legal-card" data-aos="fade-up">
+                <div class="badge">Technické info</div>
+                <h1>Využívání <span>Cookies</span></h1>
+                <p>Jako u většiny moderních webových stránek, i na 3DCRAFT.STORE využíváme drobné soubory zvané cookies, aby web fungoval správně a rychle.</p>
+
+                <h2>1. Co jsou to cookies?</h2>
+                <p>Cookies jsou malé textové soubory, které se ukládají do vašeho prohlížeče při návštěvě webu. Pomáhají webu si zapamatovat, co jste dělali, nebo zajišťují, aby grafické prvky (jako animace nebo naše kalkulačka) běžely plynule.</p>
+
+                <h2>2. Jaké cookies používáme?</h2>
+                <p>Na tomto webu používáme primárně <strong>nezbytné technické cookies</strong>:</p>
+                <ul>
+                    <li><strong>Funkční cookies:</strong> Jsou nutné pro správný chod kalkulačky a nahrávání modelů.</li>
+                    <li><strong>Bezpečnostní cookies:</strong> Protože web běží na platformě GitHub Pages, mohou být využívány technické cookies pro ochranu serveru a zajištění bezpečného přenosu dat (HTTPS).</li>
+                </ul>
+
+                <h2>3. Žádné sledování pro reklamy</h2>
+                <p>Na rozdíl od velkých e-shopů na tomto webu nepoužíváme žádné pokročilé marketingové nástroje pro sledování vašeho pohybu po internetu ani vás nebudeme "pronásledovat" reklamou na jiných stránkách.</p>
+
+                <h2>4. Jak cookies zakázat?</h2>
+                <p>Většina prohlížečů cookies přijímá automaticky. Pokud si je nepřejete ukládat, můžete je v nastavení svého prohlížeče zakázat nebo vymazat. Upozorňujeme však, že po zakázání cookies nemusí naše kalkulačka fungovat na 100 % správně.</p>
+
+                <h2>5. GitHub Pages</h2>
+                <p>Jelikož je tento web hostován na službě GitHub Pages, bere uživatel na vědomí, že společnost GitHub může sbírat technické logy (např. IP adresu) pro účely zabezpečení a provozu své infrastruktury.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>&copy; 2026 3DCRAFT.STORE. Všechna práva vyhrazena.</div>
+                <ul class="footer-links">
+                    <li><a href="/3dcraft.store/podminky">Obchodní podmínky</a></li>
+                    <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
+                    <li><a href="/3dcraft.store/cookies">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navGroup = document.getElementById('nav-group');
+        mobileMenu.addEventListener('click', () => { navGroup.classList.toggle('active'); });
+    </script>
+</body>
+</html>
