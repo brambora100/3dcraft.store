@@ -2,17 +2,17 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Výběr Zásilkovny | 3DCRAFT</title>
+    <title>Výběr doručení | 3DCRAFT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     <style>
         :root {
             --primary: #6366f1;
             --bg: #0f172a;
-            --text-main: #1e1b4b;
-            --text-sub: #64748b;
-            --success: #22c55e;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
         }
 
         body { 
@@ -27,95 +27,67 @@
         }
 
         .card { 
-            background: white; 
+            background: var(--card-bg); 
             padding: 40px; 
             border-radius: 32px; 
             text-align: center; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            max-width: 420px; 
+            max-width: 400px; 
             width: 100%; 
-            box-sizing: border-box;
         }
 
-        .logo { 
-            font-size: 24px; 
-            font-weight: 900; 
-            margin-bottom: 30px; 
-            color: var(--text-main); 
-            letter-spacing: 2px;
-        }
-
+        .logo { font-size: 24px; font-weight: 900; margin-bottom: 30px; letter-spacing: 2px; color: var(--text-dark); }
         .logo span { color: var(--primary); }
 
-        /* Kontejnery pro stavy */
-        #loading-area, #selection-area, #success-area, #error-area {
-            display: none;
-        }
+        /* Stavy - schované v základu */
+        #loading-ui, #selection-ui, #done-ui, #error-ui { display: none; }
 
         .btn { 
             background: var(--primary); 
             color: white; 
             border: none; 
-            padding: 18px 25px; 
+            padding: 20px; 
             border-radius: 16px; 
             font-weight: 800; 
             cursor: pointer; 
             width: 100%; 
-            transition: all 0.3s ease; 
-            font-size: 15px; 
+            transition: 0.3s; 
+            font-size: 16px; 
             text-transform: uppercase;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
         }
 
-        .btn:hover { 
-            background: #4f46e5; 
-            transform: translateY(-2px);
-            box-shadow: 0 15px 20px -3px rgba(99, 102, 241, 0.4);
-        }
+        .btn:hover { background: #4f46e5; transform: translateY(-3px); }
 
-        .status-title {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .info-text {
-            color: var(--text-sub);
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
-
-        .warning-box {
-            background: #fff1f2;
-            color: #e11d48;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-
-        .pobocka-detail {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 16px;
-            border-radius: 16px;
-            margin: 15px 0;
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
             font-weight: 700;
-            color: var(--text-main);
+            margin-bottom: 16px;
+            text-transform: uppercase;
         }
 
-        /* Loader */
+        .badge-waiting { background: #fef3c7; color: #92400e; }
+        .badge-success { background: #dcfce7; color: #166534; }
+
+        h2 { font-size: 22px; margin: 0 0 12px; color: var(--text-dark); }
+        p { color: var(--text-light); font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+
+        .pobocka-box {
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-weight: 700;
+        }
+
         .loader { 
-            border: 4px solid #f3f3f3; 
-            border-top: 4px solid var(--primary); 
-            border-radius: 50%; 
-            width: 40px; 
-            height: 40px; 
-            animation: spin 1s linear infinite; 
-            margin: 20px auto; 
+            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); 
+            border-radius: 50%; width: 40px; height: 40px; 
+            animation: spin 1s linear infinite; margin: 0 auto; 
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -125,27 +97,29 @@
     <div class="card">
         <div class="logo">3D<span>CRAFT</span></div>
 
-        <div id="loading-area">
+        <div id="loading-ui">
             <div class="loader"></div>
-            <p class="info-text">Prověřuji vaši objednávku...</p>
+            <p style="margin-top: 20px;">Načítám detaily objednávky...</p>
         </div>
 
-        <div id="selection-area">
-            <p class="info-text">Vyberte si prosím výdejní místo Zásilkovny pro doručení vašeho modelu.</p>
-            <button id="open-map-btn" class="btn">📍 Otevřít mapu poboček</button>
-            <div class="warning-box">⚠️ Výběr je finální a nelze jej změnit.</div>
+        <div id="selection-ui">
+            <div class="status-badge badge-waiting">Doprava nevybrána</div>
+            <h2>Kam model pošleme?</h2>
+            <p>Vyberte si prosím výdejní místo v síti Zásilkovna. Jakmile pobočku zvolíte, začneme s tiskem.</p>
+            <button id="btn-pick" class="btn">📍 Vybrat výdejní místo</button>
         </div>
 
-        <div id="success-area">
-            <span class="status-title" style="color: var(--success);">✅ JIŽ VYBRÁNO</span>
-            <p class="info-text">Doručení je nastaveno na:</p>
-            <div id="selected-pobocka-name" class="pobocka-detail">---</div>
-            <p class="info-text" style="font-size: 13px;">Místo již nelze změnit. Pokud potřebujete provést změnu, kontaktujte nás na info@3dcraft.cz</p>
+        <div id="done-ui">
+            <div class="status-badge badge-success">Pobočka uložena</div>
+            <h2>Máme hotovo!</h2>
+            <p>Váš model doručíme na adresu:</p>
+            <div id="display-pobocka" class="pobocka-box">---</div>
+            <p style="font-size: 13px;">O dalším postupu vás budeme informovat e-mailem.</p>
         </div>
 
-        <div id="error-area">
-            <span class="status-title" style="color: #e11d48;">❌ CHYBA</span>
-            <p id="error-message" class="info-text"></p>
+        <div id="error-ui">
+            <h2 style="color: #e11d48;">Chyba ❌</h2>
+            <p id="error-text">Odkaz není platný.</p>
         </div>
     </div>
 
@@ -162,81 +136,71 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
 
-    const areas = {
-        loading: document.getElementById('loading-area'),
-        selection: document.getElementById('selection-area'),
-        success: document.getElementById('success-area'),
-        error: document.getElementById('error-area')
+    const ui = {
+        loading: document.getElementById('loading-ui'),
+        selection: document.getElementById('selection-ui'),
+        done: document.getElementById('done-ui'),
+        error: document.getElementById('error-ui')
     };
 
-    function showArea(name) {
-        Object.keys(areas).forEach(key => {
-            areas[key].style.display = (key === name) ? 'block' : 'none';
-        });
+    function showUI(section) {
+        Object.keys(ui).forEach(key => ui[key].style.display = (key === section ? 'block' : 'none'));
     }
 
-    async function checkOrder() {
+    async function init() {
         if (!orderId) {
-            showArea('error');
-            document.getElementById('error-message').innerText = "Chybí identifikační číslo objednávky.";
+            showUI('error');
             return;
         }
 
-        showArea('loading');
+        showUI('loading');
 
         try {
             const docRef = doc(db, "objednavky", orderId);
-            const docSnap = await getDoc(docRef);
+            const snap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+            if (snap.exists()) {
+                const data = snap.data();
                 if (data.pobocka && data.pobocka.trim() !== "") {
-                    document.getElementById('selected-pobocka-name').innerText = data.pobocka;
-                    showArea('success');
+                    document.getElementById('display-pobocka').innerText = data.pobocka;
+                    showUI('done');
                 } else {
-                    showArea('selection');
+                    showUI('selection');
                 }
             } else {
-                showArea('error');
-                document.getElementById('error-message').innerText = "Objednávka nebyla nalezena.";
+                showUI('error');
+                document.getElementById('error-text').innerText = "Objednávka nenalezena.";
             }
-        } catch (error) {
-            showArea('error');
-            document.getElementById('error-message').innerText = "Chyba při načítání dat z databáze.";
+        } catch (e) {
+            showUI('error');
+            document.getElementById('error-text').innerText = "Chyba databáze.";
         }
     }
 
-    async function openMap() {
+    document.getElementById('btn-pick').onclick = () => {
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
-                const confirmChoice = confirm(`Potvrdit výběr?\n\nPobočka: ${point.name}\nAdresa: ${point.street}, ${point.city}`);
-                if (!confirmChoice) return;
-
-                showArea('loading');
-
+                showUI('loading');
                 try {
                     await updateDoc(doc(db, "objednavky", orderId), {
                         pobocka: point.name,
                         pobocka_adresa: point.street + ", " + point.city,
                         stav: "doprava_vybrana" 
                     });
-                    
-                    document.getElementById('selected-pobocka-name').innerText = point.name;
-                    showArea('success');
+                    document.getElementById('display-pobocka').innerText = point.name;
+                    showUI('done');
                 } catch (e) {
-                    showArea('selection');
-                    alert("Chyba při ukládání: " + e.message);
+                    alert("Chyba při ukládání!");
+                    showUI('selection');
                 }
             }
         }, { country: "cz" });
-    }
+    };
 
-    document.getElementById('open-map-btn').addEventListener('click', openMap);
-    checkOrder();
+    init();
 </script>
 </body>
 </html>
