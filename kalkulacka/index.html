@@ -31,7 +31,7 @@
             line-height: 1.6;
         }
 
-        /* --- NAVIGACE (Sjednocená s Home) --- */
+        /* --- NAVIGACE - PŘESNĚ PODLE HOME --- */
         header { 
             position: fixed; top: 20px; left: 0; right: 0; 
             display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
@@ -68,11 +68,11 @@
             margin-left: 8px; transition: 0.3s;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
-        .btn-poptavka:hover { transform: translateY(-1px); background: var(--primary-hover); }
+        .btn-poptavka:hover { transform: translateY(-1px); background: var(--primary-hover); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3); }
 
         .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
 
-        /* --- HERO SEKCE --- */
+        /* --- HERO SEKCE KALKULAČKY --- */
         .hero { 
             height: 45vh;
             position: relative; 
@@ -152,12 +152,16 @@
 
         @media (max-width: 900px) {
             header { top: 0; padding: 0; }
-            nav { width: 100%; border-radius: 0; justify-content: space-between; padding: 15px 20px; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); }
+            nav { width: 100%; border-radius: 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); justify-content: space-between; padding: 15px 20px; }
             .nav-sep { display: none; }
             .mobile-toggle { display: flex; }
             .nav-group {
-                position: fixed; top: 70px; left: 0; right: 0; background: white; flex-direction: column;
-                padding: 30px; gap: 15px; transform: translateY(-150%); transition: 0.4s ease-in-out;
+                position: fixed; top: 70px; left: 0; right: 0;
+                background: white; flex-direction: column;
+                padding: 30px; gap: 15px;
+                transform: translateY(-150%);
+                transition: 0.4s ease-in-out;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
                 box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             }
             .nav-group.active { transform: translateY(0); }
@@ -178,11 +182,13 @@
             </div>
 
             <div class="nav-group" id="nav-group">
-                <div class="nav-sep"></div> <a href="/3dcraft.store/" class="nav-link">Domů</a>
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/" class="nav-link">Domů</a>
                 <a href="/3dcraft.store/produkty" class="nav-link">Produkty</a>
                 <a href="/3dcraft.store/kalkulacka" class="nav-link active">Kalkulačka</a>
                 <a href="/3dcraft.store/kontakt" class="nav-link">Kontakt</a>
-                <div class="nav-sep"></div> <a href="/3dcraft.store/poptavka" class="btn-poptavka">Nezávazná Poptávka</a>
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/poptavka" class="btn-poptavka">Nezávazná Poptávka</a>
             </div>
         </nav>
     </header>
@@ -257,7 +263,6 @@
             mobileMenu.classList.toggle('open');
         });
 
-        // Zavření menu při scrollu pro hladší dojem
         window.addEventListener('scroll', () => {
             if(navGroup.classList.contains('active')) {
                 navGroup.classList.remove('active');
