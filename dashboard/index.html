@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D-Craft OS | ARES Edition</title>
+    <title>3DCRAFT OS | Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/STLLoader.js"></script>
@@ -14,26 +14,23 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .hidden { display: none !important; }
         
-        /* UI KARTY */
         .card { background: var(--card); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 20px; border-radius: 12px; border: none; background: #e2e8f0; cursor: pointer; font-weight: 700; color: #64748b; }
+        .tab-btn { padding: 12px 20px; border-radius: 12px; border: none; background: #e2e8f0; cursor: pointer; font-weight: 700; color: #64748b; transition: 0.3s; }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        /* ARES NAŠEPTÁVAČ */
         .ares-results { position: absolute; background: white; width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; margin-top: 5px; }
-        .ares-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .ares-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; text-align: left; }
         .ares-item:hover { background: #f8fafc; color: var(--primary); }
 
-        /* FORMULÁŘE */
         label { display: block; font-size: 0.8rem; font-weight: 700; margin: 15px 0 5px; color: #64748b; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #f1f5f9; font-size: 1rem; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #f1f5f9; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
         input:focus { border-color: var(--primary); outline: none; }
         
-        .btn-main { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 20px; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-calc { width:100%; padding:15px; border: 2px dashed #cbd5e1; border-radius:10px; cursor:pointer; background:none; font-weight:700; color:var(--primary); }
 
-        /* TABULKA */
         table { width: 100%; border-collapse: collapse; }
         tr.order-row { cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: 0.2s; }
         tr.order-row:hover { background: #f8fafc; }
@@ -44,24 +41,28 @@
         .s-tiskne { background: #fef3c7; color: #92400e; }
         .s-hotovo { background: #dcfce7; color: #166534; }
 
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-content { background: white; border-radius: 24px; padding: 35px; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+
+        .mail-box { margin-top: 20px; padding-top: 20px; border-top: 2px dashed #f1f5f9; }
+        .mail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .highlight-input { border: 2px solid #6366f1 !important; background: #f5f3ff; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="login-section" class="card" style="max-width: 400px; margin: 100px auto; text-align: center;">
-        <h1 style="margin-bottom: 30px;">D-CRAFT<span style="color:var(--primary)">.OS</span></h1>
+        <h1 style="margin-bottom: 30px;">3D<span style="color:var(--primary)">CRAFT</span> OS</h1>
         <input type="email" id="login-email" placeholder="E-mail">
         <input type="password" id="login-password" placeholder="Heslo" style="margin-top:10px;">
-        <button id="login-btn" class="btn-main">Vstoupit</button>
+        <button id="login-btn" class="btn-main">Vstoupit do systému</button>
     </div>
 
     <div id="dashboard-section" class="hidden">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="font-weight: 800;">D-Craft Administrace</h2>
-            <button id="logout-btn" style="background:none; border:none; color:var(--muted); cursor:pointer;">Odhlásit se</button>
+            <button id="logout-btn" style="background:none; border:none; color:var(--muted); cursor:pointer; font-weight: 700;">Odhlásit se</button>
         </div>
 
         <div class="nav-tabs">
@@ -70,10 +71,17 @@
         </div>
 
         <div id="tab-orders">
-            <input type="text" id="order-search" style="margin-bottom:15px; padding:15px; border-radius:15px;" placeholder="🔍 Hledat model, klienta nebo barvu..." oninput="renderTable()">
-            <div class="card">
+            <input type="text" id="order-search" style="margin-bottom:15px; padding:15px; border-radius:15px;" placeholder="🔍 Hledat podle modelu, klienta nebo firmy..." oninput="renderTable()">
+            <div class="card" style="padding:0; overflow:hidden;">
                 <table>
-                    <thead><tr style="text-align:left; color:var(--muted); font-size:0.8rem;"><th>NÁZEV MODELU</th><th>KLIENT</th><th>BARVA</th><th>MATERIÁL</th><th>STAV</th><th>CENA</th></tr></thead>
+                    <thead>
+                        <tr style="text-align:left; color:var(--muted); font-size:0.75rem; background: #f8fafc;">
+                            <th style="padding:15px 20px;">NÁZEV MODELU</th>
+                            <th>KLIENT / FIRMA</th>
+                            <th>STAV</th>
+                            <th style="text-align:right; padding-right:20px;">CENA</th>
+                        </tr>
+                    </thead>
                     <tbody id="orders-table"></tbody>
                 </table>
             </div>
@@ -82,22 +90,17 @@
         <div id="tab-new" class="hidden">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                 <div class="card">
-                    <h3>1. Technické zadání</h3>
+                    <h3 style="margin-top:0">1. Detaily tisku</h3>
                     <button id="btn-calc-trigger" class="btn-calc">📁 Vybrat .STL pro kalkulaci</button>
                     <input type="file" id="stl-file" class="hidden" accept=".stl">
                     <div id="file-status" style="margin-top:10px; font-weight:700; color:var(--primary);" class="hidden"></div>
                     
-                    <label>Odkaz na Printables/Thingiverse *</label>
-                    <input type="url" id="order-link">
+                    <label>Odkaz na model</label>
+                    <input type="url" id="order-link" placeholder="https://...">
                     
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <div>
-                            <label>Materiál</label>
-                            <select id="order-material" onchange="recalculatePrice()">
-                                <option>PLA</option><option>ABS</option><option>PETG</option>
-                            </select>
-                        </div>
-                        <div><label>Barva *</label><input type="text" id="order-color" placeholder="Černá matná"></div>
+                        <div><label>Materiál</label><select id="order-material" onchange="recalculatePrice()"><option>PLA</option><option>PETG</option><option>ABS</option><option>ASA</option></select></div>
+                        <div><label>Barva</label><input type="text" id="order-color" placeholder="Černá matná"></div>
                     </div>
                     
                     <label>Název projektu</label><input type="text" id="order-name">
@@ -105,24 +108,21 @@
                 </div>
 
                 <div class="card">
-                    <h3>2. Zákazník</h3>
+                    <h3 style="margin-top:0">2. Zákazník</h3>
                     <label>Jméno</label><input type="text" id="cust-name">
-                    
                     <div style="position:relative;">
-                        <label>Název firmy (ARES auto-fill)</label>
-                        <input type="text" id="cust-firm" placeholder="Začněte psát název..." oninput="searchARES(this.value)">
+                        <label>Firma (ARES)</label>
+                        <input type="text" id="cust-firm" placeholder="Hledat firmu..." oninput="searchARES(this.value)">
                         <div id="ares-results" class="ares-results hidden"></div>
                     </div>
-
-                    <div id="firm-details" class="hidden" style="margin-top:10px; background:#f0f9ff; padding:15px; border-radius:12px; border:1px solid #bae6fd;">
+                    <div id="firm-details" class="hidden" style="margin-top:15px; background:#f0f9ff; padding:15px; border-radius:12px; border:1px solid #bae6fd;">
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                             <div><label>IČO</label><input type="text" id="cust-ico"></div>
-                            <div><label>DIČ (Nepovinné)</label><input type="text" id="cust-dic"></div>
+                            <div><label>DIČ</label><input type="text" id="cust-dic"></div>
                         </div>
                     </div>
-
-                    <label>Telefon</label><input type="text" id="cust-phone">
                     <label>E-mail</label><input type="text" id="cust-email">
+                    <label>Telefon</label><input type="text" id="cust-phone">
                     <button id="add-btn" class="btn-main">Vytvořit zakázku ✅</button>
                 </div>
             </div>
@@ -132,24 +132,44 @@
 
 <div id="detail-modal" class="modal hidden">
     <div class="modal-content">
-        <h2 style="margin-top:0;">Správa zakázky</h2>
-        <div id="modal-link-box" style="padding:15px; background:#f1f5f9; border-radius:12px; margin-bottom:20px; text-align:center;"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <h2 style="margin:0;">Správa objednávky</h2>
+        <div id="modal-link-box" style="padding:12px; background:#f1f5f9; border-radius:12px; margin: 20px 0; text-align:center;"></div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
             <div>
-                <label>Stav</label><select id="edit-stav"><option value="nová">NOVÁ</option><option value="tiskne">TISKNE</option><option value="hotovo">HOTOVO</option></select>
-                <label>Název</label><input type="text" id="edit-nazev">
+                <label>Stav</label>
+                <select id="edit-stav">
+                    <option value="nová">NOVÁ</option>
+                    <option value="naceneno">NACENĚNO</option>
+                    <option value="tiskne">TISKNE</option>
+                    <option value="doprava_vybrana">DOPRAVA VYBRÁNA</option>
+                    <option value="hotovo">HOTOVO</option>
+                </select>
+                <label>Pobočka dopravy (Zásilkovna / Adresa)</label>
+                <input type="text" id="edit-pobocka" class="highlight-input" placeholder="Upravit pobočku...">
+                
+                <label>Název projektu</label><input type="text" id="edit-nazev">
                 <label>Cena (Kč)</label><input type="number" id="edit-cena">
-                <label>Barva</label><input type="text" id="edit-barva">
             </div>
             <div>
-                <label>Zákazník</label><input type="text" id="edit-zakaznik">
-                <label>Firma</label><input type="text" id="edit-firma">
+                <label>Zákazník / Firma</label><input type="text" id="edit-zakaznik">
                 <label>E-mail</label><input type="text" id="edit-email">
                 <label>Telefon</label><input type="text" id="edit-tel">
+                <label>Barva</label><input type="text" id="edit-barva">
             </div>
         </div>
+
+        <div class="mail-box">
+            <h4 style="margin:0 0 10px 0;">📧 Odeslat e-mail</h4>
+            <input type="file" id="modal-pdf-file" accept=".pdf">
+            <div class="mail-grid">
+                <button class="btn-main" style="margin:0; background:#6366f1;" onclick="sendWorkerMail('naceneni')">📧 Poslat Nacenění</button>
+                <button class="btn-main" style="margin:0; background:#10b981;" onclick="sendWorkerMail('platba')">💳 Poslat k Platbě</button>
+            </div>
+        </div>
+
         <div style="margin-top:30px; display:flex; gap:10px;">
-            <button id="save-edit" class="btn-main" style="margin:0;">Uložit</button>
+            <button id="save-edit" class="btn-main" style="margin:0; flex: 2;">💾 Uložit všechny změny</button>
             <button id="del-order" style="background:#fee2e2; color:red; border:none; padding:15px; border-radius:12px; font-weight:700; cursor:pointer;">Smazat</button>
             <button onclick="closeModal()" style="background:none; border:none; cursor:pointer; color:var(--muted);">Zavřít</button>
         </div>
@@ -165,7 +185,6 @@
         apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
         authDomain: "dcraft-748f9.firebaseapp.com",
         projectId: "dcraft-748f9",
-        storageBucket: "dcraft-748f9.appspot.com",
         appId: "1:761752992060:web:b84c4687cc3dff6afb8639"
     };
 
@@ -178,39 +197,6 @@
     let currentId = null;
     let lastWeight = 0;
 
-    // --- ARES FUNKCE ---
-    window.searchARES = async (val) => {
-        const resDiv = document.getElementById('ares-results');
-        if (val.length < 3) { resDiv.classList.add('hidden'); return; }
-
-        try {
-            const response = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/vyhledat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ obchodniJmeno: val, pocet: 5 })
-            });
-            const data = await response.json();
-            
-            if (data.ekonomickeSubjekty && data.ekonomickeSubjekty.length > 0) {
-                resDiv.innerHTML = data.ekonomickeSubjekty.map(s => `
-                    <div class="ares-item" onclick="fillFirm('${s.obchodniJmeno}', '${s.ico}', '${s.dic || ''}')">
-                        <strong>${s.obchodniJmeno}</strong><br><small>IČO: ${s.ico}</small>
-                    </div>
-                `).join('');
-                resDiv.classList.remove('hidden');
-            }
-        } catch (e) { console.error("ARES error", e); }
-    };
-
-    window.fillFirm = (name, ico, dic) => {
-        document.getElementById('cust-firm').value = name;
-        document.getElementById('cust-ico').value = ico;
-        document.getElementById('cust-dic').value = dic;
-        document.getElementById('ares-results').classList.add('hidden');
-        document.getElementById('firm-details').classList.remove('hidden');
-    };
-
-    // --- ZBYTEK SYSTÉMU ---
     window.switchTab = (t) => {
         document.getElementById('tab-orders').classList.toggle('hidden', t!=='orders');
         document.getElementById('tab-new').classList.toggle('hidden', t!=='new');
@@ -229,13 +215,42 @@
         });
     }
 
+    window.searchARES = async (val) => {
+        const resDiv = document.getElementById('ares-results');
+        if (val.length < 3) { resDiv.classList.add('hidden'); return; }
+        try {
+            const response = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/vyhledat`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ obchodniJmeno: val, pocet: 5 })
+            });
+            const data = await response.json();
+            if (data.ekonomickeSubjekty?.length > 0) {
+                resDiv.innerHTML = data.ekonomickeSubjekty.map(s => `
+                    <div class="ares-item" onclick="fillFirm('${s.obchodniJmeno}', '${s.ico}', '${s.dic || ''}')">
+                        <strong>${s.obchodniJmeno}</strong><br><small>IČO: ${s.ico}</small>
+                    </div>
+                `).join('');
+                resDiv.classList.remove('hidden');
+            }
+        } catch (e) {}
+    };
+
+    window.fillFirm = (name, ico, dic) => {
+        document.getElementById('cust-firm').value = name;
+        document.getElementById('cust-ico').value = ico;
+        document.getElementById('cust-dic').value = dic;
+        document.getElementById('ares-results').classList.add('hidden');
+        document.getElementById('firm-details').classList.remove('hidden');
+    };
+
+    // --- STL ---
     const stlInput = document.getElementById('stl-file');
     document.getElementById('btn-calc-trigger').onclick = () => stlInput.click();
     stlInput.onchange = (e) => {
         const file = e.target.files[0];
         if(!file) return;
-        document.getElementById('file-status').innerText = "⏳ Počítám...";
         document.getElementById('file-status').classList.remove('hidden');
+        document.getElementById('file-status').innerText = "⏳ Počítám...";
         const reader = new FileReader();
         reader.onload = (ev) => {
             const geometry = loader.parse(ev.target.result);
@@ -261,34 +276,30 @@
             const mat = document.getElementById('order-material').value;
             let p = Math.ceil(data[mat] || (lastWeight * 2.5 + 50));
             document.getElementById('order-price').value = p;
-            document.getElementById('file-status').innerText = `✅ Hotovo: ${Math.round(lastWeight)}g`;
-        }).catch(() => document.getElementById('order-price').value = Math.ceil(lastWeight * 2.5 + 50));
+            document.getElementById('file-status').innerText = `✅ Odhad: ${Math.round(lastWeight)}g`;
+        });
     };
 
     document.getElementById('add-btn').onclick = async () => {
-        if(!document.getElementById('order-link').value || !document.getElementById('order-name').value) return alert("Odkaz a Název jsou povinné!");
         await addDoc(collection(db, "objednavky"), {
-            nazev: document.getElementById('order-name').value, cena: Number(document.getElementById('order-price').value),
-            material: document.getElementById('order-material').value, barva: document.getElementById('order-color').value,
-            link: document.getElementById('order-link').value, zakaznik: document.getElementById('cust-name').value,
-            firma: document.getElementById('cust-firm').value, ico: document.getElementById('cust-ico').value,
-            dic: document.getElementById('cust-dic').value, tel: document.getElementById('cust-phone').value,
-            email: document.getElementById('cust-email').value, stav: "nová", datum: serverTimestamp()
+            nazev: document.getElementById('order-name').value, 
+            cena: Number(document.getElementById('order-price').value),
+            email: document.getElementById('cust-email').value,
+            barva: document.getElementById('order-color').value,
+            stav: "nová", datum: serverTimestamp(), pobocka: "Nevybráno"
         });
-        location.reload();
+        switchTab('orders');
     };
 
     window.renderTable = () => {
         const q = document.getElementById('order-search').value.toLowerCase();
-        const filtered = allOrders.filter(o => (o.nazev+o.zakaznik+o.firma+o.barva).toLowerCase().includes(q));
+        const filtered = allOrders.filter(o => (o.nazev+(o.firma||"")+(o.zakaznik||"")).toLowerCase().includes(q));
         document.getElementById('orders-table').innerHTML = filtered.map(o => `
             <tr class="order-row" onclick="openDetail('${o.id}')">
-                <td><strong>${o.nazev}</strong></td>
+                <td style="padding-left:20px;"><strong>${o.nazev}</strong></td>
                 <td>${o.firma || o.zakaznik || '---'}</td>
-                <td>${o.barva || '---'}</td>
-                <td>${o.material || '---'}</td>
                 <td><span class="pill s-${o.stav}">${o.stav}</span></td>
-                <td style="font-weight:800; color:var(--primary);">${o.cena} Kč</td>
+                <td style="text-align:right; padding-right:20px; font-weight:800; color:var(--primary);">${o.cena} Kč</td>
             </tr>
         `).join('');
     };
@@ -299,12 +310,12 @@
         document.getElementById('edit-nazev').value = o.nazev || "";
         document.getElementById('edit-cena').value = o.cena || 0;
         document.getElementById('edit-barva').value = o.barva || "";
-        document.getElementById('edit-zakaznik').value = o.zakaznik || "";
-        document.getElementById('edit-firma').value = o.firma || "";
-        document.getElementById('edit-tel').value = o.tel || "";
+        document.getElementById('edit-zakaznik').value = o.firma || o.zakaznik || "";
         document.getElementById('edit-email').value = o.email || "";
+        document.getElementById('edit-tel').value = o.tel || "";
         document.getElementById('edit-stav').value = o.stav || "nová";
-        document.getElementById('modal-link-box').innerHTML = `<a href="${o.link}" target="_blank" style="font-weight:800; color:var(--primary);">🔗 OTEVŘÍT MODEL</a>`;
+        document.getElementById('edit-pobocka').value = o.pobocka || "Nevybráno"; // Tady je to editovatelné
+        document.getElementById('modal-link-box').innerHTML = o.link ? `<a href="${o.link}" target="_blank" style="font-weight:800; color:var(--primary); text-decoration:none;">🔗 ZDROJ MODELU</a>` : 'Bez odkazu';
         document.getElementById('detail-modal').classList.remove('hidden');
     };
 
@@ -312,15 +323,45 @@
 
     document.getElementById('save-edit').onclick = async () => {
         await updateDoc(doc(db, "objednavky", currentId), {
-            nazev: document.getElementById('edit-nazev').value, cena: Number(document.getElementById('edit-cena').value),
-            barva: document.getElementById('edit-barva').value, zakaznik: document.getElementById('edit-zakaznik').value,
-            firma: document.getElementById('edit-firma').value, tel: document.getElementById('edit-tel').value,
-            email: document.getElementById('edit-email').value, stav: document.getElementById('edit-stav').value
+            nazev: document.getElementById('edit-nazev').value, 
+            cena: Number(document.getElementById('edit-cena').value),
+            barva: document.getElementById('edit-barva').value,
+            zakaznik: document.getElementById('edit-zakaznik').value,
+            email: document.getElementById('edit-email').value,
+            tel: document.getElementById('edit-tel').value,
+            stav: document.getElementById('edit-stav').value,
+            pobocka: document.getElementById('edit-pobocka').value // Uložení nové pobočky
         });
         closeModal();
     };
 
     document.getElementById('del-order').onclick = async () => { if(confirm("Smazat?")) { await deleteDoc(doc(db, "objednavky", currentId)); closeModal(); } };
+
+    window.sendWorkerMail = async (type) => {
+        const btn = event.target;
+        const originalText = btn.innerText;
+        const fileInput = document.getElementById('modal-pdf-file');
+        const file = fileInput.files[0];
+        let attachmentData = null;
+        if (file) {
+            btn.innerText = "⏳ Čtu...";
+            const reader = new FileReader();
+            attachmentData = await new Promise(r => { reader.onload = () => r(reader.result.split(',')[1]); reader.readAsDataURL(file); });
+        }
+        btn.innerText = "🚀 Posílám...";
+        try {
+            const res = await fetch("https://faktury.bilcusadam.workers.dev", {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "send_specific_mail", mailType: type, email: document.getElementById('edit-email').value,
+                    orderId: currentId, nazev: document.getElementById('edit-nazev').value, cena: document.getElementById('edit-cena').value,
+                    attachment: attachmentData ? { content: attachmentData, filename: `Faktura_${document.getElementById('edit-nazev').value}.pdf` } : null
+                })
+            });
+            btn.innerText = res.ok ? "✅ Hotovo" : "❌ Chyba";
+        } catch (e) { btn.innerText = "❌ Síť"; }
+        setTimeout(() => btn.innerText = originalText, 2000);
+    };
 </script>
 </body>
 </html>
