@@ -11,20 +11,25 @@
         .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .btn { background: #6366f1; color: white; border: none; padding: 18px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; font-size: 16px; text-transform: uppercase; }
         .btn:hover { background: #4f46e5; transform: translateY(-3px); }
-        .btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .btn.hidden { display: none; }
         #status { margin-top: 25px; font-size: 15px; color: #64748b; line-height: 1.6; }
         .warning { color: #e11d48; font-size: 13px; margin-top: 15px; font-weight: 600; display: block; }
         .logo { font-size: 28px; font-weight: 800; margin-bottom: 10px; color: #1e1b4b; }
         .logo span { color: #6366f1; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #6366f1; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="logo">3D<span>CRAFT</span></div>
-        <p style="color:#64748b; margin-bottom: 20px; font-weight: 500;">Vyberte si prosím výdejní místo Zásilkovny.</p>
+        <div id="loading-spinner" class="loader"></div>
         
-        <button id="main-btn" class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
-        <small id="warn-text" class="warning">⚠️ Pozor: Výběr je finální a nelze jej později změnit!</small>
+        <div id="content-area" style="display:none;">
+            <p style="color:#64748b; margin-bottom: 20px; font-weight: 500;">Vyberte si prosím výdejní místo Zásilkovny.</p>
+            <button id="main-btn" class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
+            <small id="warn-text" class="warning">⚠️ Pozor: Výběr je finální a nelze jej změnit!</small>
+        </div>
         
         <div id="status"></div>
     </div>
@@ -43,39 +48,59 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const orderId = new URLSearchParams(window.location.search).get('id');
+    
     const statusDiv = document.getElementById('status');
+    const contentArea = document.getElementById('content-area');
+    const loadingSpinner = document.getElementById('loading-spinner');
     const mainBtn = document.getElementById('main-btn');
-    const warnText = document.getElementById('warn-text');
 
-    // Kontrola při načtení: Už zákazník vybral?
-    async function checkStatus() {
+    async function checkOrder() {
         if (!orderId) {
-            statusDiv.innerHTML = "❌ Neplatný odkaz (chybí ID).";
-            mainBtn.disabled = true;
+            loadingSpinner.style.display = 'none';
+            statusDiv.innerHTML = "❌ Neplatný odkaz.";
             return;
         }
-        
-        const docSnap = await getDoc(doc(db, "objednavky", orderId));
-        if (docSnap.exists() && docSnap.data().pobocka) {
-            mainBtn.style.display = 'none';
-            warnText.style.display = 'none';
-            statusDiv.innerHTML = `<div style="color:#22c55e; font-weight:800; font-size:18px;">✅ DOPRAVA JIŽ BYLA VYBRÁNA</div>
-                                   <div style="margin-top:10px;">Pobočka: <b>${docSnap.data().pobocka}</b><br>Změna již není možná.</div>`;
+
+        try {
+            const docRef = doc(db, "objednavky", orderId);
+            const docSnap = await getDoc(docRef);
+
+            loadingSpinner.style.display = 'none';
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // PŘÍMÁ KONTROLA: Pokud už pobočka v databázi je, neukážeme tlačítko
+                if (data.pobocka && data.pobocka !== "") {
+                    statusDiv.innerHTML = `
+                        <div style="color:#22c55e; font-weight:800; font-size:18px;">✅ JIŽ VYBRÁNO</div>
+                        <p style="margin-top:10px;">Vaše doručení je nastaveno na:<br><b>${data.pobocka}</b></p>
+                        <p style="font-size:12px; color:#64748b;">Místo již nelze změnit. Pokud jste udělali chybu, kontaktujte nás odpovědí na e-mail.</p>
+                    `;
+                } else {
+                    // Pokud pobočka ještě není, ukážeme výběr
+                    contentArea.style.display = 'block';
+                }
+            } else {
+                statusDiv.innerHTML = "❌ Objednávka nebyla nalezena.";
+            }
+        } catch (e) {
+            loadingSpinner.style.display = 'none';
+            statusDiv.innerHTML = "❌ Chyba při načítání dat.";
         }
     }
-    checkStatus();
+
+    checkOrder();
 
     window.openMap = () => {
-        // Druhé varování přímo v mapě
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
-                const confirmChoice = confirm(`Opravdu chcete doručit balíček na pobočku: ${point.name}?\n\nPo potvrzení již nebude možné místo změnit.`);
+                const confirmChoice = confirm(`Opravdu si přejete doručit model na: ${point.name}?\n\nTento výběr je trvalý.`);
                 
                 if (!confirmChoice) return;
 
-                statusDiv.innerHTML = "⌛ <b>Ukládám výběr...</b>";
-                mainBtn.style.display = 'none';
-                warnText.style.display = 'none';
+                contentArea.style.display = 'none';
+                loadingSpinner.style.display = 'block';
 
                 try {
                     await updateDoc(doc(db, "objednavky", orderId), {
@@ -84,11 +109,15 @@
                         stav: "doprava_vybrana" 
                     });
                     
-                    statusDiv.innerHTML = `<div style="color:#22c55e; font-weight:800; font-size:18px; margin-top:10px;">✅ ÚSPĚŠNĚ ULOŽENO!</div>
-                        <div style="margin-top:10px;">Pobočka: <b>${point.name}</b><br>Tento výběr je nyní v systému uzamčen.</div>`;
+                    loadingSpinner.style.display = 'none';
+                    statusDiv.innerHTML = `
+                        <div style="color:#22c55e; font-weight:800; font-size:18px;">✅ ÚSPĚŠNĚ ULOŽENO</div>
+                        <p style="margin-top:10px;">Pobočka <b>${point.name}</b> byla uložena k vaší zakázce.</p>
+                    `;
                 } catch (e) {
-                    statusDiv.innerHTML = `<div style="color:#ef4444;">❌ Chyba: ${e.message}</div>`;
-                    mainBtn.style.display = 'block';
+                    loadingSpinner.style.display = 'none';
+                    contentArea.style.display = 'block';
+                    alert("Chyba při ukládání: " + e.message);
                 }
             }
         }, { country: "cz" });
