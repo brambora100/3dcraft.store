@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Výběr Zásilkovny | 3DCRAFT.STORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; }
+        .btn { background: #6366f1; color: white; border: none; padding: 15px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; }
+        #status { margin-top: 20px; font-size: 14px; color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 style="margin:0 0 10px 0;">3DCRAFT.STORE</h2>
+        <p style="color:#64748b;">Vyberte si pobočku Zásilkovny pro doručení Vaší objednávky.</p>
+        <button class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
+        <div id="status"></div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
+        authDomain: "dcraft-748f9.firebaseapp.com",
+        projectId: "dcraft-748f9",
+        storageBucket: "dcraft-748f9.appspot.com",
+        appId: "1:761752992060:web:b84c4687cc3dff6afb8639"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const orderId = new URLSearchParams(window.location.search).get('id');
+
+    window.openMap = () => {
+        Packeta.Widget.pick("6962383842426962", async (p) => {
+            if (p && orderId) {
+                document.getElementById('status').innerText = "⌛ Ukládám...";
+                await updateDoc(doc(db, "objednavky", orderId), {
+                    doprava_pobocka: p.name,
+                    doprava_adresa: p.street + ", " + p.city
+                });
+                document.getElementById('status').innerHTML = "✅ <b>Uloženo!</b><br>" + p.name;
+            }
+        }, { country: "cz", language: "cs" });
+    };
+</script>
+</body>
+</html>
