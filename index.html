@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3DCRAFT.STORE | Průmyslový 3D tisk</title>
     
+    <link rel="icon" type="image/png" href="https://brambora100.github.io/3dcraft.store/files/favicon.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
@@ -71,9 +73,9 @@
 
         .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
 
-        /* --- HERO - ZMĚNY PRO CELÝ OBRÁZEK --- */
+        /* --- HERO --- */
         .hero { 
-            height: 95vh; /* Trochu vyšší pro více prostoru */
+            height: 95vh; 
             position: relative; 
             display: flex; 
             align-items: center; 
@@ -93,7 +95,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             align-items: center;
-            gap: 70px; /* Větší mezera */
+            gap: 70px; 
             width: 100%;
             position: relative;
             z-index: 2;
@@ -110,18 +112,17 @@
             align-items: center;
             position: relative;
         }
-        /* ZDE JSOU ZMĚNY PRO ZMENŠENÍ OBRÁZKU */
         .hero-product-image {
-            max-width: 100%; /* Na šířku se přizpůsobí */
-            max-height: 70vh; /* Na výšku se zmenší, aby byla vidět celá */
+            max-width: 100%; 
+            max-height: 70vh; 
             height: auto;
-            width: auto; /* Důležité pro zachování poměru stran s max-height */
+            width: auto; 
             filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));
             transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
             cursor: pointer;
         }
         .hero-product-image:hover {
-            transform: scale(1.03) translateY(-10px); /* Jemnější hover */
+            transform: scale(1.03) translateY(-10px); 
             filter: drop-shadow(0 25px 50px rgba(0,0,0,0.15));
         }
 
@@ -304,7 +305,6 @@
 
         mobileMenu.addEventListener('click', () => {
             navGroup.classList.toggle('active');
-            mobileMenu.classList.toggle('open');
         });
 
         window.addEventListener('scroll', () => {
