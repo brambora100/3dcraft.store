@@ -11,7 +11,6 @@
         .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .btn { background: #6366f1; color: white; border: none; padding: 18px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; font-size: 16px; text-transform: uppercase; }
         .btn:hover { background: #4f46e5; transform: translateY(-3px); }
-        .btn.hidden { display: none; }
         #status { margin-top: 25px; font-size: 15px; color: #64748b; line-height: 1.6; }
         .warning { color: #e11d48; font-size: 13px; margin-top: 15px; font-weight: 600; display: block; }
         .logo { font-size: 28px; font-weight: 800; margin-bottom: 10px; color: #1e1b4b; }
@@ -26,8 +25,8 @@
         <div id="loading-spinner" class="loader"></div>
         
         <div id="content-area" style="display:none;">
-            <p style="color:#64748b; margin-bottom: 20px; font-weight: 500;">Vyberte si prosím výdejní místo Zásilkovny.</p>
-            <button id="main-btn" class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
+            <p style="color:#64748b; margin-bottom: 20px; font-weight: 500;">Vyberte si prosím výdejní místo Zásilkovny pro vaši objednávku.</p>
+            <button id="main-btn" class="btn">📍 Otevřít mapu poboček</button>
             <small id="warn-text" class="warning">⚠️ Pozor: Výběr je finální a nelze jej změnit!</small>
         </div>
         
@@ -47,7 +46,10 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const orderId = new URLSearchParams(window.location.search).get('id');
+    
+    // Získání ID z URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('id');
     
     const statusDiv = document.getElementById('status');
     const contentArea = document.getElementById('content-area');
@@ -57,7 +59,7 @@
     async function checkOrder() {
         if (!orderId) {
             loadingSpinner.style.display = 'none';
-            statusDiv.innerHTML = "❌ Neplatný odkaz.";
+            statusDiv.innerHTML = "❌ Neplatný nebo chybějící odkaz na objednávku.";
             return;
         }
 
@@ -70,29 +72,28 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 
-                // PŘÍMÁ KONTROLA: Pokud už pobočka v databázi je, neukážeme tlačítko
-                if (data.pobocka && data.pobocka !== "") {
+                // Pokud už pobočka v databázi je (pole existuje a není prázdné)
+                if (data.pobocka && data.pobocka.trim() !== "") {
                     statusDiv.innerHTML = `
                         <div style="color:#22c55e; font-weight:800; font-size:18px;">✅ JIŽ VYBRÁNO</div>
                         <p style="margin-top:10px;">Vaše doručení je nastaveno na:<br><b>${data.pobocka}</b></p>
-                        <p style="font-size:12px; color:#64748b;">Místo již nelze změnit. Pokud jste udělali chybu, kontaktujte nás odpovědí na e-mail.</p>
+                        <p style="font-size:12px; color:#64748b;">Místo již nelze změnit. Pokud potřebujete změnu, kontaktujte nás.</p>
                     `;
                 } else {
-                    // Pokud pobočka ještě není, ukážeme výběr
                     contentArea.style.display = 'block';
                 }
             } else {
-                statusDiv.innerHTML = "❌ Objednávka nebyla nalezena.";
+                statusDiv.innerHTML = "❌ Objednávka nebyla v našem systému nalezena.";
             }
-        } catch (e) {
+        } catch (error) {
+            console.error("Firebase Error:", error);
             loadingSpinner.style.display = 'none';
-            statusDiv.innerHTML = "❌ Chyba při načítání dat.";
+            statusDiv.innerHTML = "❌ Chyba při komunikaci s databází.<br><small>Zkontrolujte prosím připojení nebo oprávnění.</small>";
         }
     }
 
-    checkOrder();
-
-    window.openMap = () => {
+    // Funkce pro otevření mapy
+    function openMap() {
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
                 const confirmChoice = confirm(`Opravdu si přejete doručit model na: ${point.name}?\n\nTento výběr je trvalý.`);
@@ -112,16 +113,24 @@
                     loadingSpinner.style.display = 'none';
                     statusDiv.innerHTML = `
                         <div style="color:#22c55e; font-weight:800; font-size:18px;">✅ ÚSPĚŠNĚ ULOŽENO</div>
-                        <p style="margin-top:10px;">Pobočka <b>${point.name}</b> byla uložena k vaší zakázce.</p>
+                        <p style="margin-top:10px;">Pobočka <b>${point.name}</b> byla úspěšně uložena.</p>
+                        <p>Brzy vás budeme informovat o dalším postupu.</p>
                     `;
                 } catch (e) {
+                    console.error("Update Error:", e);
                     loadingSpinner.style.display = 'none';
                     contentArea.style.display = 'block';
-                    alert("Chyba při ukládání: " + e.message);
+                    alert("Chyba při ukládání pobočky: " + e.message);
                 }
             }
         }, { country: "cz" });
-    };
+    }
+
+    // Přiřazení eventu tlačítku (bezpečnější než onclick v HTML u modulů)
+    mainBtn.addEventListener('click', openMap);
+
+    // Spuštění kontroly
+    checkOrder();
 </script>
 </body>
 </html>
