@@ -31,7 +31,6 @@
             min-height: 100vh;
         }
 
-        /* --- NOVÁ NAVIGACE (ZAPAMATOVANÁ) --- */
         header { 
             position: fixed; top: 20px; left: 0; right: 0; 
             display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
@@ -75,7 +74,6 @@
         .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; z-index: 1001; }
         .mobile-toggle span { width: 22px; height: 2px; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
 
-        /* --- HERO SEKCE --- */
         .hero { 
             height: 45vh; position: relative; display: flex; align-items: center; justify-content: center;
             background-image: url('https://cdr.cz/sites/default/files/adobestock_164378664.jpeg');
@@ -89,7 +87,6 @@
         .hero h1 { position: relative; z-index: 10; font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; letter-spacing: -2px; color: var(--text-main); }
         .hero h1 span { color: var(--primary); }
 
-        /* --- OBSAH --- */
         .contact-section { padding-bottom: 100px; margin-top: -60px; position: relative; z-index: 20; flex: 1; }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 25px; }
 
@@ -114,7 +111,6 @@
         .info-text h4 { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .info-text p { font-weight: 700; font-size: 1.05rem; }
 
-        /* --- FORMULÁŘ --- */
         .contact-form { background: var(--bg-soft); padding: 50px; border-radius: 30px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
@@ -131,8 +127,8 @@
             cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
         }
         .btn-send:hover { transform: translateY(-2px); background: var(--primary-hover); }
+        .btn-send:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        /* --- FOOTER --- */
         footer { padding: 40px 0; background: white; border-top: 1px solid rgba(0,0,0,0.05); margin-top: auto; }
         .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); }
         .footer-links { display: flex; gap: 25px; list-style: none; }
@@ -222,19 +218,17 @@
 
                 <div class="contact-form">
                     <form id="contactForm">
-                        <input type="hidden" name="access_key" value="3cbbe662-5bce-418b-bac5-72e5cdeb8ef8">
-                        
                         <div class="form-group">
                             <label>Vaše jméno</label>
-                            <input type="text" name="name" class="form-control" placeholder="Jméno a příjmení" required>
+                            <input type="text" id="form-name" class="form-control" placeholder="Jméno a příjmení" required>
                         </div>
                         <div class="form-group">
                             <label>E-mailová adresa</label>
-                            <input type="email" name="email" class="form-control" placeholder="vase@adresa.cz" required>
+                            <input type="email" id="form-email" class="form-control" placeholder="vase@adresa.cz" required>
                         </div>
                         <div class="form-group">
                             <label>Zpráva</label>
-                            <textarea name="message" class="form-control" placeholder="S čím vám můžeme pomoci?" required></textarea>
+                            <textarea id="form-message" class="form-control" placeholder="S čím vám můžeme pomoci?" required></textarea>
                         </div>
                         <button type="submit" class="btn-send" id="submitBtn">Odeslat zprávu</button>
                     </form>
@@ -252,7 +246,6 @@
                     <li><a href="/3dcraft.store/obchodni-podminky">Obchodní podmínky</a></li>
                     <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
                     <li><a href="/3dcraft.store/cookies">Cookies</a></li>
-
                 </ul>
             </div>
         </div>
@@ -270,36 +263,48 @@
             navGroup.classList.toggle('active');
         });
 
-        // Script pro odesílání formuláře
+        // NOVÝ SCRIPT PRO TVŮJ WORKER + RESEND
         const form = document.getElementById('contactForm');
-        form.addEventListener('submit', function(e) {
+        
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const btn = document.getElementById('submitBtn');
-            btn.innerText = 'Odesílám...';
+            const originalBtnText = btn.innerText;
+            
+            // Stav odesílání
+            btn.innerText = '⌛ Odesílám...';
             btn.disabled = true;
 
-            const formData = new FormData(form);
-            const object = Object.fromEntries(formData);
-            const json = JSON.stringify(object);
+            // Příprava dat
+            const data = {
+                name: document.getElementById('form-name').value,
+                email: document.getElementById('form-email').value,
+                message: document.getElementById('form-message').value
+            };
 
-            fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: json
-            })
-            .then(async (response) => {
-                if (response.status == 200) {
-                    alert('Zpráva byla úspěšně odeslána!');
+            try {
+                // Volání tvého Cloudflare Workeru
+                const response = await fetch('https://kontaktniformular.bilcusadam.workers.dev/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('✅ Zpráva byla úspěšně odeslána!');
                     form.reset();
                 } else {
-                    alert('Chyba při odesílání.');
+                    const errorMsg = await response.text();
+                    alert('❌ Chyba při odesílání: ' + errorMsg);
                 }
-            })
-            .catch(error => { alert('Došlo k chybě při spojení se serverem.'); })
-            .then(() => {
-                btn.innerText = 'Odeslat zprávu';
+            } catch (error) {
+                alert('❌ Došlo k chybě při spojení se serverem. Zkontrolujte připojení.');
+                console.error('Error:', error);
+            } finally {
+                btn.innerText = originalBtnText;
                 btn.disabled = false;
-            });
+            }
         });
     </script>
 </body>
