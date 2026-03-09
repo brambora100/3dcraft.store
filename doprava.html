@@ -8,16 +8,17 @@
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; }
-        .btn { background: #6366f1; color: white; border: none; padding: 15px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; }
-        #status { margin-top: 20px; font-size: 14px; color: #64748b; }
+        .card { background: white; padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; border: 1px solid #e2e8f0; }
+        .btn { background: #6366f1; color: white; border: none; padding: 15px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn:hover { background: #4f46e5; }
+        #status { margin-top: 20px; font-size: 14px; color: #64748b; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2 style="margin:0 0 10px 0;">3DCRAFT.STORE</h2>
-        <p style="color:#64748b;">Vyberte si pobočku Zásilkovny pro doručení Vaší objednávky.</p>
-        <button class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
+        <h2 style="margin:0 0 10px 0; color:#0f172a;">3DCRAFT.STORE</h2>
+        <p style="color:#64748b; margin-bottom: 25px;">Vyberte si prosím výdejní místo pro doručení Vaší objednávky.</p>
+        <button id="main-btn" class="btn" onclick="openMap()">📍 Otevřít mapu poboček</button>
         <div id="status"></div>
     </div>
 
@@ -35,17 +36,43 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const orderId = new URLSearchParams(window.location.search).get('id');
+    
+    // Získání ID z URL adresy
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('id');
 
     window.openMap = () => {
-        Packeta.Widget.pick("6962383842426962", async (p) => {
-            if (p && orderId) {
-                document.getElementById('status').innerText = "⌛ Ukládám...";
-                await updateDoc(doc(db, "objednavky", orderId), {
-                    doprava_pobocka: p.name,
-                    doprava_adresa: p.street + ", " + p.city
-                });
-                document.getElementById('status').innerHTML = "✅ <b>Uloženo!</b><br>" + p.name;
+        if (!orderId) {
+            alert("V odkazu chybí ID objednávky. Prosím, použijte odkaz z e-mailu.");
+            return;
+        }
+
+        // Widget Zásilkovny
+        Packeta.Widget.pick("6962383842426962", async (point) => {
+            if (point) {
+                console.log("Vybraný bod:", point);
+                const statusDiv = document.getElementById('status');
+                const mainBtn = document.getElementById('main-btn');
+                
+                statusDiv.innerHTML = "⌛ <b>Ukládám výběr do systému...</b>";
+                mainBtn.style.display = 'none';
+
+                try {
+                    const orderRef = doc(db, "objednavky", orderId);
+                    await updateDoc(orderRef, {
+                        doprava_pobocka: point.name,
+                        doprava_adresa: point.street + ", " + point.city,
+                        stav: "doprava_vybrana" // Změníme stav, aby admin viděl akci
+                    });
+                    
+                    console.log("Zápis do Firebase úspěšný!");
+                    statusDiv.innerHTML = `<div style="color:#22c55e; font-weight:700; font-size:16px; margin-top:10px;">✅ Hotovo!</div>
+                                          <div style="margin-top:10px;">Pobočka <b>${point.name}</b> byla uložena k Vaší objednávce. Okno můžete zavřít.</div>`;
+                } catch (error) {
+                    console.error("Chyba při zápisu:", error);
+                    statusDiv.innerHTML = `<div style="color:#ef4444;">❌ Chyba při ukládání: ${error.message}</div>`;
+                    mainBtn.style.display = 'block';
+                }
             }
         }, { country: "cz", language: "cs" });
     };
