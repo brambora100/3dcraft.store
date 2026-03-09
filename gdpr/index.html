@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDPR | 3DCRAFT.STORE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #ffffff;
+            --bg-soft: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- UNIFIKOVANÝ NAVBAR --- */
+        header { 
+            position: fixed; top: 20px; left: 0; right: 0; 
+            display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
+        }
+
+        nav { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 10px 14px; border-radius: 24px; 
+            display: flex; align-items: center; 
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: fit-content;
+        }
+
+        .nav-logo { padding: 0 15px; text-decoration: none; font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
+        .nav-logo span { color: var(--primary); }
+        .nav-group { display: flex; gap: 4px; align-items: center; }
+        .nav-link { 
+            color: var(--text-muted); 
+            text-decoration: none; font-size: 0.85rem; font-weight: 700; 
+            padding: 10px 16px; border-radius: 14px; 
+            transition: 0.3s; 
+        }
+        .nav-link:hover { color: var(--primary); background: var(--bg-soft); }
+        .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
+
+        .btn-poptavka { 
+            background: var(--primary); color: white; 
+            padding: 10px 22px; border-radius: 14px; 
+            text-decoration: none; font-size: 0.85rem; font-weight: 800;
+            margin-left: 8px; transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; }
+        .mobile-toggle span { width: 22px; height: 2px; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
+
+        /* --- CONTENT --- */
+        .legal-section { padding: 140px 0 80px; flex: 1; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 25px; }
+        
+        .legal-card {
+            background: white;
+            padding: 60px;
+            border-radius: 40px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.02);
+        }
+
+        .badge {
+            background: #f1f5ff;
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 10px; }
+        h1 span { color: var(--primary); }
+        h2 { margin: 40px 0 20px; font-size: 1.4rem; font-weight: 800; color: var(--text-main); border-left: 4px solid var(--primary); padding-left: 15px; }
+        p { margin-bottom: 20px; color: var(--text-muted); line-height: 1.8; }
+        strong { color: var(--text-main); }
+
+        /* --- FOOTER --- */
+        footer { padding: 40px 0; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-muted); }
+        .footer-links { list-style: none; display: flex; gap: 24px; }
+        .footer-links a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 600; }
+        .footer-links a:hover { color: var(--primary); }
+
+        @media (max-width: 900px) {
+            header { top: 0; padding: 0; }
+            nav { width: 100%; border-radius: 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); justify-content: space-between; padding: 15px 20px; }
+            .nav-sep { display: none; }
+            .mobile-toggle { display: flex; }
+            .nav-group {
+                position: fixed; top: 70px; left: 0; right: 0;
+                background: white; flex-direction: column;
+                padding: 30px; gap: 15px;
+                transform: translateY(-150%);
+                transition: 0.4s ease-in-out;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            }
+            .nav-group.active { transform: translateY(0); }
+            .legal-card { padding: 30px; border-radius: 30px; }
+            h1 { font-size: 2rem; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header> 
+        <nav>
+            <a href="/3dcraft.store/" class="nav-logo">3DCRAFT<span>.STORE</span></a>
+            <div class="mobile-toggle" id="mobile-menu">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="nav-group" id="nav-group">
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/" class="nav-link">Domů</a>
+                <a href="/3dcraft.store/produkty" class="nav-link">Produkty</a>
+                <a href="/3dcraft.store/kalkulacka" class="nav-link">Kalkulačka</a>
+                <a href="/3dcraft.store/kontakt" class="nav-link">Kontakt</a>
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/poptavka" class="btn-poptavka">Nezávazná Poptávka</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="legal-section">
+        <div class="container">
+            <div class="legal-card" data-aos="fade-up">
+                <div class="badge">Soukromí</div>
+                <h1>Ochrana <span>osobních údajů</span></h1>
+                <p>U 3DCRAFT.STORE si zakládáme na férovém přístupu. Protože nejsem klasický e-shop, ale poskytuji <strong>individuální služby 3D tisku na zakázku</strong>, zpracovávám vaše údaje pouze pro účely naší vzájemné komunikace přes e-mail a doručení hotových modelů.</p>
+
+                <h2>1. Správce údajů</h2>
+                <p>
+                    Vaše údaje spravuji já jako fyzická osoba podnikající:<br>
+                    <strong>[Jméno]</strong>, IČO: [IČO], se sídlem [Sídlo].
+                </p>
+
+                <h2>2. Proč údaje potřebuji?</h2>
+                <p>Sbírám pouze to nejnutnější, abych mohl odpovědět na váš e-mail a poslat vám balíček:</p>
+                <ul>
+                    <li><strong>E-mail:</strong> Abych vám mohl poslat cenový odhad a platební QR kód.</li>
+                    <li><strong>Adresa a telefon:</strong> Abych mohl objednat dopravu (Zásilkovna/Balíkovna).</li>
+                    <li><strong>3D Modely:</strong> Které nahrajete do kalkulačky nebo pošlete e-mailem pro realizaci tisku.</li>
+                </ul>
+
+                <h2>3. Žádný spam</h2>
+                <p>Vaše údaje nepoužívám k rozesílání žádných newsletterů ani je neprodávám třetím stranám. Vaše data vidím pouze já a následně dopravce v momentě odeslání balíku.</p>
+
+                <h2>4. Smazání dat</h2>
+                <p>Pokud si budete přát, abych vaši e-mailovou komunikaci nebo zaslané 3D modely po dokončení zakázky smazal, stačí napsat. Standardně si modely nechávám v archivu po dobu záruky pro případné dotisky při poškození, poté je čistím.</p>
+
+                <h2>5. Bezpečnost</h2>
+                <p>Web běží na zabezpečeném protokolu HTTPS a vaše soubory jsou zpracovávány lokálně pro účely přípravy tisku (slicing).</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>&copy; 2026 3DCRAFT.STORE. Všechna práva vyhrazena.</div>
+                <ul class="footer-links">
+                    <li><a href="/3dcraft.store/podminky">Obchodní podmínky</a></li>
+                    <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
+                    <li><a href="/3dcraft.store/cookies">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navGroup = document.getElementById('nav-group');
+        mobileMenu.addEventListener('click', () => { navGroup.classList.toggle('active'); });
+    </script>
+</body>
+</html>
