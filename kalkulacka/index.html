@@ -33,7 +33,7 @@
             min-height: 100vh;
         }
 
-        /* --- NAVIGACE (ZAPAMATOVANÁ) --- */
+        /* --- UNIFIKOVANÝ NAVBAR --- */
         header { 
             position: fixed; top: 20px; left: 0; right: 0; 
             display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
@@ -63,6 +63,8 @@
         .nav-link:hover { color: var(--primary); background: var(--bg-soft); }
         .nav-link.active { background: var(--primary); color: white; }
 
+        .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
+
         .btn-poptavka { 
             background: var(--primary); color: white; 
             padding: 10px 22px; border-radius: 14px; 
@@ -70,11 +72,10 @@
             margin-left: 8px; transition: 0.3s;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
-        .btn-poptavka:hover { transform: translateY(-1px); background: var(--primary-hover); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3); }
+        .btn-poptavka:hover { transform: translateY(-1px); background: var(--primary-hover); }
 
-        .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
-
-        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; z-index: 1001; }
+        /* --- HAMBURGER --- */
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; }
         .mobile-toggle span { width: 22px; height: 2px; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
 
         /* --- HERO --- */
@@ -113,14 +114,7 @@
         select { width: 100%; padding: 18px; border-radius: 16px; border: 2px solid #f1f5f9; font-weight: 600; outline: none; background: white; cursor: pointer; }
         
         .price-display { font-size: 5rem; font-weight: 800; color: #818cf8; line-height: 1; }
-        
-        .price-note { 
-            margin-top: 20px; 
-            font-size: 0.75rem; 
-            opacity: 0.5; 
-            max-width: 250px; 
-            line-height: 1.4; 
-        }
+        .price-note { margin-top: 20px; font-size: 0.75rem; opacity: 0.5; max-width: 250px; line-height: 1.4; }
 
         /* --- FOOTER --- */
         footer { padding: 40px 0; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); margin-top: auto; }
@@ -129,7 +123,7 @@
         .footer-links a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 600; }
         .footer-links a:hover { color: var(--primary); }
 
-        /* --- MOBILE --- */
+        /* --- RESPONSIVITA --- */
         @media (max-width: 900px) {
             header { top: 0; padding: 0; }
             nav { width: 100%; border-radius: 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); justify-content: space-between; padding: 15px 20px; }
@@ -141,14 +135,12 @@
                 padding: 30px; gap: 15px;
                 transform: translateY(-150%);
                 transition: 0.4s ease-in-out;
-                border-bottom: 1px solid rgba(0,0,0,0.05);
                 box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-                width: 100%;
             }
             .nav-group.active { transform: translateY(0); }
             .btn-poptavka { margin: 10px 0 0 0; width: 100%; text-align: center; }
             .calc-card { grid-template-columns: 1fr; }
-            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+            .form-left, .form-right { padding: 30px; }
         }
     </style>
 </head>
