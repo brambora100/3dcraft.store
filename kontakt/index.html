@@ -30,7 +30,7 @@
             min-height: 100vh;
         }
 
-        /* --- NAVBAR (STEJNÝ JAKO KALKULAČKA) --- */
+        /* --- NOVÁ NAVIGACE (ZAPAMATOVANÁ) --- */
         header { 
             position: fixed; top: 20px; left: 0; right: 0; 
             display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
@@ -48,6 +48,7 @@
 
         .nav-logo { padding: 0 15px; text-decoration: none; font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
         .nav-logo span { color: var(--primary); }
+
         .nav-group { display: flex; gap: 4px; align-items: center; }
         
         .nav-link { 
@@ -66,7 +67,12 @@
             margin-left: 8px; transition: 0.3s;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
+        .btn-poptavka:hover { transform: translateY(-1px); background: var(--primary-hover); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3); }
+
         .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
+
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; z-index: 1001; }
+        .mobile-toggle span { width: 22px; height: 2px; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
 
         /* --- HERO SEKCE --- */
         .hero { 
@@ -79,7 +85,7 @@
             background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.4) 100%);
             z-index: 2;
         }
-        .hero h1 { position: relative; z-index: 10; font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; letter-spacing: -2px; color: var(--text-dark); }
+        .hero h1 { position: relative; z-index: 10; font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; letter-spacing: -2px; color: var(--text-main); }
         .hero h1 span { color: var(--primary); }
 
         /* --- OBSAH --- */
@@ -87,7 +93,7 @@
         .container { max-width: 1100px; margin: 0 auto; padding: 0 25px; }
 
         .contact-grid { 
-            display: grid;  grid-template-columns: 1fr 1.5fr; gap: 40px; 
+            display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; 
             background: white; padding: 20px; border-radius: 40px;
             box-shadow: 0 40px 80px rgba(0,0,0,0.06);
             border: 1px solid rgba(0,0,0,0.05);
@@ -133,20 +139,38 @@
         .footer-links a:hover { color: var(--primary); }
 
         @media (max-width: 900px) {
-            .contact-grid { grid-template-columns: 1fr; border-radius: 30px; }
-            .nav-group { display: none; }
             header { top: 0; padding: 0; }
-            nav { width: 100%; border-radius: 0; justify-content: space-between; }
+            nav { width: 100%; border-radius: 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); justify-content: space-between; padding: 15px 20px; }
+            .nav-sep { display: none; }
+            .mobile-toggle { display: flex; }
+            .nav-group {
+                position: fixed; top: 70px; left: 0; right: 0;
+                background: white; flex-direction: column;
+                padding: 30px; gap: 15px;
+                transform: translateY(-150%);
+                transition: 0.4s ease-in-out;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            }
+            .nav-group.active { transform: translateY(0); }
+            .contact-grid { grid-template-columns: 1fr; border-radius: 30px; }
             .contact-info, .contact-form { padding: 30px; }
+            .btn-poptavka { margin: 10px 0 0 0; width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-    <header>
+    <header> 
         <nav>
             <a href="/3dcraft.store/" class="nav-logo">3DCRAFT<span>.STORE</span></a>
-            <div class="nav-group">
+            
+            <div class="mobile-toggle" id="mobile-menu">
+                <span></span><span></span><span></span>
+            </div>
+
+            <div class="nav-group" id="nav-group">
+                <div class="nav-sep"></div>
                 <a href="/3dcraft.store/" class="nav-link">Domů</a>
                 <a href="/3dcraft.store/produkty" class="nav-link">Produkty</a>
                 <a href="/3dcraft.store/kalkulacka" class="nav-link">Kalkulačka</a>
@@ -235,7 +259,15 @@
     <script>
         AOS.init({ duration: 800, once: true });
 
-        // Script pro odesílání formuláře zůstává stejný
+        // Mobilní menu toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navGroup = document.getElementById('nav-group');
+
+        mobileMenu.addEventListener('click', () => {
+            navGroup.classList.toggle('active');
+        });
+
+        // Script pro odesílání formuláře
         const form = document.getElementById('contactForm');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
