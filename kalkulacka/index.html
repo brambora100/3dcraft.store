@@ -23,9 +23,17 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-        /* --- PŘESNĚ OPSANÉ CSS NAVIGACE --- */
+        /* --- NAVBAR --- */
         header { 
             position: fixed; top: 20px; left: 0; right: 0; 
             display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
@@ -43,7 +51,6 @@
 
         .nav-logo { padding: 0 15px; text-decoration: none; font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
         .nav-logo span { color: var(--primary); }
-
         .nav-group { display: flex; gap: 4px; align-items: center; }
         
         .nav-link { 
@@ -62,24 +69,69 @@
             margin-left: 8px; transition: 0.3s;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
-        .btn-poptavka:hover { transform: translateY(-1px); background: var(--primary-hover); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3); }
 
         .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
 
-        /* --- ZBYTEK STRÁNKY --- */
-        .hero { height: 40vh; display: flex; align-items: center; justify-content: center; text-align: center; padding-top: 80px; background: #f8fafc; }
-        .hero h1 { font-size: 3rem; font-weight: 800; }
+        /* --- HERO --- */
+        .hero { 
+            height: 50vh; position: relative; display: flex; align-items: center; justify-content: center;
+            background-image: url('https://imagedelivery.net/7WKcVsmsOjoGLZ6M5TFPXA/076d023a-99f4-4d57-0aa5-74676a9d6400/width=1920,height=1080,fit=cover');
+            background-size: cover; background-position: center;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.4) 100%);
+            z-index: 2;
+        }
+        .hero-content { position: relative; z-index: 10; text-align: center; padding-top: 60px; }
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 3.8rem); font-weight: 800; letter-spacing: -2px; }
         .hero h1 span { color: var(--primary); }
 
-        .calc-section { padding: 60px 0; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-        .calc-card { background: white; border-radius: 30px; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        .form-left { padding: 40px; }
-        .form-right { background: #0f172a; padding: 40px; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .price-display { font-size: 4rem; font-weight: 800; color: #818cf8; }
+        /* --- CALC CARD --- */
+        .calc-section { padding-bottom: 100px; margin-top: -80px; position: relative; z-index: 20; flex: 1; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 25px; }
+
+        .calc-card {
+            background: white; border-radius: 40px; display: grid; grid-template-columns: 1.3fr 1fr; 
+            box-shadow: 0 50px 100px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .form-left { padding: 50px; }
+        .form-right { background: #0f172a; padding: 50px; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         
-        .drop-zone { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 20px; cursor: pointer; margin: 20px 0; }
-        select { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; margin-top: 10px; }
+        .input-group { margin-bottom: 30px; }
+        .input-group label { display: block; font-weight: 700; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; }
+        
+        .drop-zone { border: 2px dashed #cbd5e1; cursor: pointer; text-align: center; padding: 60px 20px; border-radius: 20px; background: #f8fafc; transition: 0.3s; }
+        .drop-zone:hover { border-color: var(--primary); background: #f1f5ff; }
+        
+        select { width: 100%; padding: 18px; border-radius: 16px; border: 2px solid #f1f5f9; font-weight: 600; outline: none; background: white; cursor: pointer; }
+        
+        .price-display { font-size: 5rem; font-weight: 800; color: #818cf8; line-height: 1; }
+        
+        /* NOVÁ POZNÁMKA POD CENOU */
+        .price-note { 
+            margin-top: 20px; 
+            font-size: 0.75rem; 
+            opacity: 0.5; 
+            max-width: 250px; 
+            line-height: 1.4; 
+        }
+
+        /* --- FOOTER --- */
+        footer { padding: 40px 0; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-muted); }
+        .footer-links { list-style: none; display: flex; gap: 24px; }
+        .footer-links a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 600; }
+        .footer-links a:hover { color: var(--primary); }
+
+        @media (max-width: 900px) {
+            .calc-card { grid-template-columns: 1fr; }
+            .nav-group { display: none; }
+            header { top: 0; padding: 0; }
+            nav { width: 100%; border-radius: 0; justify-content: space-between; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -100,43 +152,87 @@
     </header>
 
     <section class="hero">
-        <div>
-            <h1>Cenová <span>Kalkulačka</span></h1>
-            <p>Nahrajte svůj model a zjistěte cenu během vteřiny.</p>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 data-aos="zoom-in">Cenová <span>Kalkulačka</span></h1>
+            <p>Okamžitý odhad ceny vašeho 3D modelu.</p>
         </div>
     </section>
 
     <main class="calc-section">
         <div class="container">
-            <div class="calc-card">
+            <div class="calc-card" data-aos="fade-up">
                 <div class="form-left">
-                    <label>Nahrajte model (.STL)</label>
-                    <div class="drop-zone" id="drop-zone">
-                        <p id="file-name">Klikněte nebo přetáhněte soubor</p>
-                        <input type="file" id="stl-input" accept=".stl" style="display: none;">
+                    <div class="input-group">
+                        <label>3D Model (.STL)</label>
+                        <div class="drop-zone" id="drop-zone">
+                            <p id="file-name">📄 Klikněte nebo přetáhněte model sem</p>
+                            <input type="file" id="stl-input" accept=".stl" style="display: none;">
+                        </div>
                     </div>
-                    <label>Materiál</label>
-                    <select id="material-select">
-                        <option value="PLA">PLA</option>
-                        <option value="PETG">PETG</option>
-                        <option value="ASA">ASA</option>
-                    </select>
+                    <div class="input-group">
+                        <label>Materiál</label>
+                        <select id="material-select">
+                            <option value="PLA">PLA (Standardní tisk)</option>
+                            <option value="PETG">PETG (Odolný tisk)</option>
+                            <option value="ASA">ASA (Technický - UV stabilní)</option>
+                            <option value="PA-CF">PA-CF (Karbonem plněný)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-right">
-                    <div style="opacity: 0.7; text-transform: uppercase; font-size: 0.8rem;">Odhad ceny</div>
+                    <div style="opacity: 0.6; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Odhadovaná cena</div>
                     <div class="price-display" id="total-price">0<span style="font-size: 1.5rem; color: white;"> Kč</span></div>
+                    <div class="price-note">
+                        * Cena je pouze orientační. Nezahrnuje tiskové podpěry a může se lišit podle náročnosti geometrie.
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>&copy; 2026 3DCRAFT.STORE. Všechna práva vyhrazena.</div>
+                <ul class="footer-links">
+                    <li><a href="/3dcraft.store/podminky">Obchodní podmínky</a></li>
+                    <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
+                    <li><a href="/3dcraft.store/cookies">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        AOS.init({ duration: 800, once: true });
+
         const fileInput = document.getElementById('stl-input');
         const dropZone = document.getElementById('drop-zone');
+        const materialSelect = document.getElementById('material-select');
         const priceDisplay = document.getElementById('total-price');
         const loader = new THREE.STLLoader();
 
+        let cachedVaha = 0;
+
         dropZone.onclick = () => fileInput.click();
+
+        const getPriceFromApi = (vaha) => {
+            if (vaha === 0) return;
+            fetch('https://round-feather-938f.bilcusadam.workers.dev/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vaha: vaha })
+            })
+            .then(res => res.json())
+            .then(data => {
+                priceDisplay.innerHTML = `${data[materialSelect.value]}<span style="font-size: 1.5rem; color: white;"> Kč</span>`;
+            });
+        };
+
+        materialSelect.onchange = () => { if (cachedVaha > 0) getPriceFromApi(cachedVaha); };
+
         fileInput.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -152,16 +248,8 @@
                     const v3 = new THREE.Vector3(pos[i+6], pos[i+7], pos[i+8]);
                     volume += v1.dot(v2.cross(v3)) / 6.0;
                 }
-                const vaha = (Math.abs(volume) / 1000) * 1.25;
-                fetch('https://round-feather-938f.bilcusadam.workers.dev/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ vaha: vaha })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    priceDisplay.innerHTML = `${data[document.getElementById('material-select').value]}<span style="font-size: 1.5rem; color: white;"> Kč</span>`;
-                });
+                cachedVaha = (Math.abs(volume) / 1000) * 1.25;
+                getPriceFromApi(cachedVaha);
             };
             reader.readAsArrayBuffer(file);
         };
