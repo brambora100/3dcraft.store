@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Model nenalezen | 3DCRAFT.STORE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #ffffff;
+            --bg-soft: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- UNIFIKOVANÝ NAVBAR --- */
+        header { 
+            position: fixed; top: 20px; left: 0; right: 0; 
+            display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
+        }
+
+        nav { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 10px 14px; border-radius: 24px; 
+            display: flex; align-items: center; 
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: fit-content;
+        }
+
+        .nav-logo { padding: 0 15px; text-decoration: none; font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
+        .nav-logo span { color: var(--primary); }
+        .nav-group { display: flex; gap: 4px; align-items: center; }
+        .nav-link { 
+            color: var(--text-muted); 
+            text-decoration: none; font-size: 0.85rem; font-weight: 700; 
+            padding: 10px 16px; border-radius: 14px; 
+            transition: 0.3s; 
+        }
+        .nav-link:hover { color: var(--primary); background: var(--bg-soft); }
+        .nav-sep { width: 1px; height: 24px; background: rgba(0, 0, 0, 0.1); margin: 0 12px; }
+
+        .btn-poptavka { 
+            background: var(--primary); color: white; 
+            padding: 10px 22px; border-radius: 14px; 
+            text-decoration: none; font-size: 0.85rem; font-weight: 800;
+            margin-left: 8px; transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; }
+        .mobile-toggle span { width: 22px; height: 2px; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
+
+        /* --- 404 CONTENT STYLED --- */
+        .error-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .error-code-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .error-bg {
+            font-size: clamp(8rem, 20vw, 12rem);
+            font-weight: 900;
+            color: #f1f5f9;
+            line-height: 1;
+            letter-spacing: -5px;
+        }
+
+        .error-fg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(6rem, 15vw, 9rem);
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+            letter-spacing: -2px;
+            z-index: 2;
+        }
+
+        h1 { font-size: 2.5rem; font-weight: 800; margin-top: -10px; letter-spacing: -1px; }
+        p { color: var(--text-muted); font-size: 1.1rem; margin: 20px 0 40px; line-height: 1.6; max-width: 500px; margin-inline: auto; }
+
+        .btn-home {
+            background: var(--text-main);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 800;
+            transition: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            display: inline-block;
+        }
+        .btn-home:hover { 
+            background: var(--primary);
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.2); 
+        }
+
+        /* Dekorační "špagety" z tisku */
+        .spaghetti-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: radial-gradient(circle, var(--primary) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        /* --- FOOTER --- */
+        footer { padding: 40px 0; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-muted); padding: 0 25px; max-width: 1100px; margin: 0 auto; }
+        .footer-links { list-style: none; display: flex; gap: 24px; }
+        .footer-links a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 600; }
+        .footer-links a:hover { color: var(--primary); }
+
+        @media (max-width: 900px) {
+            header { top: 0; padding: 0; }
+            nav { width: 100%; border-radius: 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.05); justify-content: space-between; padding: 15px 20px; }
+            .nav-sep { display: none; }
+            .mobile-toggle { display: flex; }
+            .nav-group {
+                position: fixed; top: 70px; left: 0; right: 0;
+                background: white; flex-direction: column;
+                padding: 30px; gap: 15px;
+                transform: translateY(-150%);
+                transition: 0.4s ease-in-out;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            }
+            .nav-group.active { transform: translateY(0); }
+            h1 { font-size: 1.8rem; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header> 
+        <nav>
+            <a href="/3dcraft.store/" class="nav-logo">3DCRAFT<span>.STORE</span></a>
+            <div class="mobile-toggle" id="mobile-menu">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="nav-group" id="nav-group">
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/" class="nav-link">Domů</a>
+                <a href="/3dcraft.store/produkty" class="nav-link">Produkty</a>
+                <a href="/3dcraft.store/kalkulacka" class="nav-link">Kalkulačka</a>
+                <a href="/3dcraft.store/kontakt" class="nav-link">Kontakt</a>
+                <div class="nav-sep"></div>
+                <a href="/3dcraft.store/poptavka" class="btn-poptavka">Nezávazná Poptávka</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="error-section">
+        <div class="error-container" data-aos="zoom-in">
+            <div class="error-code-wrapper">
+                <div class="error-bg">404</div>
+                <div class="error-fg">404</div>
+            </div>
+            <h1>Ups! Tady došlo k chybě v tisku.</h1>
+            <p>Stránka, kterou hledáte, se nejspíš „odlepila od podložky“ nebo nikdy neexistovala. Zkuste se vrátit na začátek.</p>
+            <a href="/3dcraft.store/" class="btn-home">Zpět na hlavní stranu</a>
+        </div>
+        <div class="spaghetti-overlay"></div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div>&copy; 2026 3DCRAFT.STORE. Všechna práva vyhrazena.</div>
+            <ul class="footer-links">
+                <li><a href="/3dcraft.store/podminky">Obchodní podmínky</a></li>
+                <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
+                <li><a href="/3dcraft.store/cookies">Cookies</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navGroup = document.getElementById('nav-group');
+        mobileMenu.addEventListener('click', () => { navGroup.classList.toggle('active'); });
+    </script>
+</body>
+</html>
