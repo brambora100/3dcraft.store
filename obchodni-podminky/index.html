@@ -31,7 +31,7 @@
             min-height: 100vh;
         }
 
-        /* --- UNIFIKOVANÝ NAVBAR --- */
+        /* --- NAVBAR --- */
         header { 
             position: fixed; top: 20px; left: 0; right: 0; 
             display: flex; justify-content: center; z-index: 1000; padding: 0 20px; 
@@ -98,8 +98,8 @@
         h2 { margin: 40px 0 20px; font-size: 1.4rem; font-weight: 800; color: var(--text-main); border-left: 4px solid var(--primary); padding-left: 15px; }
         p { margin-bottom: 20px; color: var(--text-muted); line-height: 1.8; }
         strong { color: var(--text-main); }
-        ul { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
-        li { margin-bottom: 10px; }
+        ul { margin-bottom: 25px; padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 12px; }
 
         /* --- FOOTER --- */
         footer { padding: 40px 0; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); margin-top: auto; }
@@ -151,45 +151,48 @@
     <main class="legal-section">
         <div class="container">
             <div class="legal-card" data-aos="fade-up">
-                <div class="badge">Právní dokumentace</div>
+                <div class="badge">Aktualizováno k 10. 3. 2026</div>
                 <h1>Obchodní <span>podmínky</span></h1>
                 <p>Tyto obchodní podmínky upravují vztah mezi <strong>provozovatelem</strong> (prodávajícím) a <strong>zákazníkem</strong> (kupujícím) v rámci projektu 3DCRAFT.TECH.</p>
 
                 <h2>1. Identifikace provozovatele</h2>
                 <p>
                     Provozovatelem webu a poskytovatelem služeb je fyzická podnikající osoba:<br>
-                    <strong>Jméno provozovatele</strong><br>
-                    IČO: [DOPLŇTE IČO]<br>
-                    Sídlo: [DOPLŇTE ADRESU]<br>
-                    (zapsán v živnostenském rejstříku)<br><br>
-                    Provozovatel <strong>není plátcem DPH</strong>.
+                    <strong>ADAM BILČUS</strong><br>
+                    IČO: [DOPLŇ SVÉ IČO]<br>
+                    Sídlo: [DOPLŇ SVOU ADRESU]<br>
+                    (Zapsán v živnostenském rejstříku. Provozovatel <strong>není plátcem DPH</strong>.)
                 </p>
 
                 <h2>2. Zakázkový charakter výroby</h2>
-                <p>Hlavní činností 3DCRAFT.TECH je výroba 3D modelů metodou aditivního tisku na základě specifických požadavků zákazníka (zakázková výroba).</p>
+                <p>Hlavní činností 3DCRAFT.TECH je výroba 3D modelů metodou aditivního tisku na základě specifických požadavků zákazníka.</p>
                 <ul>
                     <li>Vzhledem k tomu, že zboží je vyráběno „na míru“, bere zákazník na vědomí, že <strong>nelze odstoupit od smlouvy bez udání důvodu ve lhůtě 14 dnů</strong> (§ 1837 občanského zákoníku).</li>
                     <li>Provozovatel neodpovídá za autorská práva k modelům dodaným zákazníkem, ani za jejich funkční vady způsobené špatným digitálním návrhem předlohy.</li>
                 </ul>
 
                 <h2>3. Objednávka a platební proces</h2>
-                <p>Kalkulačka na webu slouží k získání orientačního cenového odhadu. Závazná objednávka vzniká až po odsouhlasení finální ceny e-mailem a zaslání kompletních fakturačních údajů.</p>
-                <p><strong>Způsob platby:</strong> Platby probíhají bankovním převodem. Pro maximální pohodlí zasíláme v potvrzovacím e-mailu <strong>platební údaje spolu s QR kódem</strong>. Výroba zakázky započne až po připsání platby na bankovní účet provozovatele.</p>
+                <p>Kalkulačka na webu slouží k získání <strong>orientačního cenového odhadu</strong> na základě objemu modelu.</p>
+                <ul>
+                    <li>Zákazník bere na vědomí, že finální cena se může lišit v závislosti na technologické náročnosti tisku (zejména spotřeba materiálu na <strong>podpěry (supports)</strong>, optimalizace orientace tisku a tiskové parametry).</li>
+                    <li>Závazná objednávka vzniká až po potvrzení finální cenové kalkulace e-mailem.</li>
+                    <li><strong>Způsob platby:</strong> Výhradně bankovním převodem (v potvrzení zasíláme QR kód). Výroba započne až po připsání platby.</li>
+                </ul>
 
                 <h2>4. Ceny a doprava</h2>
-                <p>Všechny ceny jsou konečné (nejsem plátce DPH). K ceně tisku je připočítávána cena za dopravu přes službu <strong>Zásilkovna</strong>.</p>
+                <p>Všechny ceny jsou konečné. K ceně tisku je připočítávána doprava přes službu <strong>Zásilkovna</strong>.</p>
                 <p>Zákazník je povinen zásilku převzít. V případě nevyzvednutí zakázkového zboží odpovídá zákazník za vzniklou škodu (náklady na materiál, tisk a marné doručení).</p>
 
                 <h2>5. Záruka a specifika technologie</h2>
                 <p>Na zboží se vztahuje zákonná odpovědnost za vady. Reklamace se však <strong>nevztahuje</strong> na:</p>
                 <ul>
-                    <li>Estetické vlastnosti, které jsou přirozeným výsledkem technologie FDM/SLA (např. viditelné vrstvy, drobné stopy po podpěrách nebo mikro-artefakty na povrchu).</li>
+                    <li>Estetické vlastnosti přirozené pro 3D tisk (viditelné vrstvy, drobné stopy po podpěrách nebo povrchové artefakty).</li>
                     <li>Mírné odchylky v odstínu barvy filamentu oproti zobrazení na monitoru.</li>
                     <li>Rozměrové odchylky v rámci běžné tolerance materiálu (standardně ±0,2 mm).</li>
                 </ul>
 
                 <h2>6. Závěrečná ustanovení</h2>
-                <p>Tyto podmínky jsou platné a účinné od 10. 3. 2026. Provozovatel si vyhrazuje právo na změnu podmínek, přičemž pro zákazníka platí verze podmínek účinná v momentě odeslání objednávky.</p>
+                <p>Tyto podmínky jsou platné od data uvedeného výše. Provozovatel si vyhrazuje právo na změnu podmínek, přičemž pro zákazníka platí verze účinná v momentě odeslání objednávky.</p>
             </div>
         </div>
     </main>
@@ -201,7 +204,6 @@
                 <ul class="footer-links">
                     <li><a href="/3dcraft.store/podminky">Obchodní podmínky</a></li>
                     <li><a href="/3dcraft.store/gdpr">GDPR</a></li>
-                    <li><a href="/3dcraft.store/cookies">Cookies</a></li>
                 </ul>
             </div>
         </div>
@@ -210,10 +212,8 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({ duration: 800, once: true });
-
         const mobileMenu = document.getElementById('mobile-menu');
         const navGroup = document.getElementById('nav-group');
-
         mobileMenu.addEventListener('click', () => {
             navGroup.classList.toggle('active');
         });
