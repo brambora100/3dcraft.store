@@ -13,6 +13,9 @@
             --card-bg: #ffffff;
             --text-dark: #0f172a;
             --text-light: #64748b;
+            --danger: #ef4444;
+            --card-width: 400px;
+            --card-height: 480px;
         }
 
         body { 
@@ -24,72 +27,143 @@
             min-height: 100vh; 
             margin: 0; 
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .card { 
             background: var(--card-bg); 
-            padding: 40px; 
+            padding: 50px 40px; 
             border-radius: 32px; 
             text-align: center; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            max-width: 400px; 
-            width: 100%; 
+            width: var(--card-width); 
+            height: var(--card-height); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Logo fixně nahoře */
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
         }
 
-        .logo { font-size: 24px; font-weight: 900; margin-bottom: 30px; letter-spacing: 2px; color: var(--text-dark); }
+        /* Centrování obsahu pod logem pro stabilní layout */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1; /* Zabere zbytek místa v kartě */
+            width: 100%;
+        }
+
+        .logo { 
+            font-size: 24px; 
+            font-weight: 900; 
+            letter-spacing: 2px; 
+            color: var(--text-dark); 
+            margin-bottom: 20px; /* Mezera pod logem */
+            flex-shrink: 0;
+        }
         .logo span { color: var(--primary); }
 
-        #loading-ui, #selection-ui, #done-ui, #error-ui { display: none; }
+        .ui-section { 
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .btn { 
             background: var(--primary); 
             color: white; 
             border: none; 
-            padding: 20px; 
+            padding: 18px; 
             border-radius: 16px; 
             font-weight: 800; 
             cursor: pointer; 
             width: 100%; 
             transition: 0.3s; 
-            font-size: 16px; 
+            font-size: 15px; 
             text-transform: uppercase;
             box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+            margin-top: 20px;
         }
 
-        .btn:hover { background: #4f46e5; transform: translateY(-3px); }
+        .btn:hover { background: #4f46e5; transform: translateY(-2px); }
 
         .status-badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 7px 16px;
             border-radius: 100px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 16px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 25px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .badge-waiting { background: #fef3c7; color: #92400e; }
         .badge-success { background: #dcfce7; color: #166534; }
+        .badge-error { background: #fee2e2; color: #b91c1c; }
 
-        h2 { font-size: 22px; margin: 0 0 12px; color: var(--text-dark); }
-        p { color: var(--text-light); font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+        h2 { font-size: 22px; margin: 0 0 12px; color: var(--text-dark); font-weight: 800; line-height: 1.3; }
+        p { color: var(--text-light); font-size: 14px; line-height: 1.6; margin: 0 0 24px; }
 
         .pobocka-box {
             background: #f8fafc;
             border: 2px dashed #e2e8f0;
-            padding: 20px;
+            padding: 18px;
             border-radius: 16px;
-            margin: 20px 0;
+            margin: 10px 0 25px 0;
             font-weight: 700;
             color: var(--primary);
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .loader { 
             border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); 
-            border-radius: 50%; width: 40px; height: 40px; 
-            animation: spin 1s linear infinite; margin: 0 auto; 
+            border-radius: 50%; width: 50px; height: 50px; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .error-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #fee2e2;
+            color: var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Responzivita pro malé displeje */
+        @media (max-width: 450px) {
+            :root {
+                --card-width: 100%;
+                --card-height: auto;
+            }
+            .card {
+                padding: 40px 25px;
+                min-height: 400px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -97,29 +171,33 @@
     <div class="card">
         <div class="logo">3D<span>CRAFT</span></div>
 
-        <div id="loading-ui">
-            <div class="loader"></div>
-            <p style="margin-top: 20px;">Zpracovávám...</p>
-        </div>
+        <div class="content-wrapper">
+            <div id="loading-ui" class="ui-section">
+                <div class="loader"></div>
+                <p style="font-weight: 700; color: var(--text-dark);">Načítám detaily objednávky...</p>
+            </div>
 
-        <div id="selection-ui">
-            <div class="status-badge badge-waiting">Doprava nevybrána</div>
-            <h2>Kam model pošleme?</h2>
-            <p>Vyberte si prosím výdejní místo Zásilkovny. Po výběru pobočky se nám data okamžitě propíšou do systému.</p>
-            <button id="btn-pick" class="btn">📍 Vybrat výdejní místo</button>
-        </div>
+            <div id="selection-ui" class="ui-section">
+                <div class="status-badge badge-waiting">Čeká na výběr</div>
+                <h2>Kam model pošleme?</h2>
+                <p>Vyberte si prosím výdejní místo Zásilkovny. Data se po výběru okamžitě propíšou do našeho systému.</p>
+                <button id="btn-pick" class="btn">📍 Vybrat výdejní místo</button>
+            </div>
 
-        <div id="done-ui">
-            <div class="status-badge badge-success">Pobočka uložena</div>
-            <h2>Máme hotovo!</h2>
-            <p>Váš model doručíme na adresu:</p>
-            <div id="display-pobocka" class="pobocka-box">---</div>
-            <p style="font-size: 13px;">Nyní můžete toto okno zavřít. Brzy vás budeme kontaktovat ohledně platby.</p>
-        </div>
+            <div id="done-ui" class="ui-section">
+                <div class="status-badge badge-success">Doprava uložena</div>
+                <h2>Máme hotovo!</h2>
+                <p>Váš model doručíme na adresu:</p>
+                <div id="display-pobocka" class="pobocka-box">---</div>
+                <p style="font-size: 12px; margin-bottom: 0;">Okno můžete zavřít. Brzy vás budeme kontaktovat ohledně platby.</p>
+            </div>
 
-        <div id="error-ui">
-            <h2 style="color: #e11d48;">Chyba ❌</h2>
-            <p id="error-text">Odkaz není platný nebo vypršel.</p>
+            <div id="error-ui" class="ui-section">
+                <div class="status-badge badge-error">Nelze načíst</div>
+                <div class="error-icon">×</div>
+                <h2>Chyba přístupu</h2>
+                <p id="error-text">Tento odkaz není platný. Pravděpodobně chybí bezpečnostní token, nebo byla objednávka již vyřízena.</p>
+            </div>
         </div>
     </div>
 
@@ -138,8 +216,6 @@
     const db = getFirestore(app);
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
-
-    // Tvůj Cloudflare Worker pro synchronizaci
     const WORKER_URL = "https://emailoveakce.bilcusadam.workers.dev/";
 
     const ui = {
@@ -150,7 +226,7 @@
     };
 
     function showUI(section) {
-        Object.keys(ui).forEach(key => ui[key].style.display = (key === section ? 'block' : 'none'));
+        Object.keys(ui).forEach(key => ui[key].style.display = (key === section ? 'flex' : 'none'));
     }
 
     async function init() {
@@ -167,7 +243,6 @@
 
             if (snap.exists()) {
                 const data = snap.data();
-                // Kontrola pole shipAddress (to používá tvoje admin verze)
                 if (data.shipAddress && data.shipAddress.includes("Zásilkovna")) {
                     document.getElementById('display-pobocka').innerText = data.shipAddress;
                     showUI('done');
@@ -175,32 +250,29 @@
                     showUI('selection');
                 }
             } else {
+                document.getElementById('error-text').innerText = "Objednávka nebyla v databázi nalezena.";
                 showUI('error');
-                document.getElementById('error-text').innerText = "Objednávka nenalezena.";
             }
         } catch (e) {
             console.error(e);
+            document.getElementById('error-text').innerText = "Došlo k technické chybě při komunikaci s databází.";
             showUI('error');
-            document.getElementById('error-text').innerText = "Chyba při načítání dat.";
         }
     }
 
     document.getElementById('btn-pick').onclick = () => {
-        // Používám tvůj API klíč pro Zásilkovnu z kódu
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
                 showUI('loading');
                 const fullAddress = `Zásilkovna: ${point.name}, ${point.street}, ${point.city}`;
                 
                 try {
-                    // 1. Uložíme přímo do Firebase (pro jistotu)
                     await updateDoc(doc(db, "objednavky", orderId), {
                         shipAddress: fullAddress,
-                        pobocka_id: point.id,
-                        stav: "nová" // Ponecháme stav nebo změníme dle potřeby
+                        pobocka_id: point.id
                     });
 
-                    // 2. Pošleme informaci Workeru (volitelné, ale dobré pro synchronizaci)
+                    // Synchronizace s workerem
                     await fetch(WORKER_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
