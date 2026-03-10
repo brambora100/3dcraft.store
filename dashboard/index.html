@@ -376,7 +376,6 @@
         const tiskCena = parseInt(document.getElementById('final-price-display').innerText);
         const fullAddr = `${document.getElementById('cust-address').value}, ${document.getElementById('cust-city').value} ${document.getElementById('cust-psc').value}`;
         
-        // AUTOMATICKÉ DOPLNĚNÍ POZNÁMKY O VYUŽITÍ A MNOŽSTVÍ
         const vyuziti = document.getElementById('proj-env').value;
         const mnozstvi = document.getElementById('pcs-input').value;
         const puvodniPoznamka = document.getElementById('proj-note').value;
@@ -419,7 +418,7 @@
             tr.onclick = () => openDetail(o);
             tr.innerHTML = `
                 <td><span class="id-badge">${o.id.substring(0,8)}</span> <strong>${o.nazev}</strong></td>
-                <td>${o.zakaznik || 'Neznámý'}</td>
+                <td>${o.zakaznik || o.zakaznik_jmeno || 'Neznámý'}</td>
                 <td><small>${o.shipAddress || '⚠️ Čeká na výběr'}</small></td>
                 <td><span class="pill s-${o.stav}">${o.stav}</span></td>
                 <td align="right"><strong>${o.cena} Kč</strong></td>
@@ -437,13 +436,22 @@
         document.getElementById('det-stav').value = o.stav;
         document.getElementById('det-price').value = o.cena;
         document.getElementById('det-email').value = o.email || "";
-        document.getElementById('det-cust-name').value = o.zakaznik || "";
+        
+        // prioritní načítání z nového formuláře vs ruční zadání
+        document.getElementById('det-cust-name').value = o.firma_nazev || o.zakaznik_jmeno || o.zakaznik || "";
+        document.getElementById('det-phone').value = o.zakaznik_tel || o.phone || "";
+        document.getElementById('det-ico').value = o.firma_ico || o.ico || "";
+        document.getElementById('det-dic').value = o.firma_dic || o.dic || "";
+        
+        // Složení adresy pokud přišla z formuláře
+        let fullAddr = o.fakturacniAdresa || "";
+        if (o.zakaznik_ulice) {
+            fullAddr = `${o.zakaznik_ulice}, ${o.zakaznik_mesto} ${o.zakaznik_psc}`;
+        }
+        document.getElementById('det-full-address').value = fullAddr;
+
         document.getElementById('det-material').value = o.material || "";
         document.getElementById('det-color').value = o.barva || "";
-        document.getElementById('det-ico').value = o.ico || "";
-        document.getElementById('det-dic').value = o.dic || "";
-        document.getElementById('det-full-address').value = o.fakturacniAdresa || "";
-        document.getElementById('det-phone').value = o.phone || "";
         document.getElementById('det-note').value = o.poznamka || "";
         document.getElementById('det-ship-address').innerText = o.shipAddress || "Doprava zatím nevybrána";
         document.getElementById('detail-modal').classList.remove('hidden');
