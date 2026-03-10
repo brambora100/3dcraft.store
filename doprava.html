@@ -16,25 +16,25 @@
         label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; color: #475569; }
         input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* Přepínač dopravy */
+        .shipping-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .ship-option { border: 2px solid var(--border); padding: 15px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
+        .ship-option.active { border-color: var(--primary); background: #eef2ff; color: var(--primary); font-weight: 700; }
+        .ship-price { display: block; font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
+
         .company-fields { display: none; background: #f1f5f9; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #e2e8f0; }
         .btn { background: var(--primary); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; margin-top: 20px; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
-        .btn-secondary { background: transparent; color: #64748b; border: 1px solid var(--border); padding: 10px; margin-top: 10px; font-size: 0.8rem; }
         
+        #balikovna-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        #balikovna-modal iframe { width: 90%; max-width: 800px; height: 80%; border-radius: 20px; border: none; }
+        
+        .rekap-box { text-align: left; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-top: 10px; }
+        .rekap-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
         #loading-ui { display: none; flex-direction: column; align-items: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .rekap-box { text-align: left; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-top: 10px; }
-        .rekap-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        .rekap-row:last-child { border: none; }
-
-        /* Styl pro modal okno Balíkovny */
-        #balikovna-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;
-        }
-        #balikovna-modal iframe { width: 90%; max-width: 800px; height: 80%; border-radius: 20px; border: none; }
     </style>
 </head>
 <body>
@@ -44,20 +44,28 @@
 </div>
 
 <div class="card">
-    <div id="loading-ui"><div class="spinner"></div><p>Ukládám data do systému...</p></div>
+    <div id="loading-ui"><div class="spinner"></div><p>Ukládám data...</p></div>
 
     <div id="details-ui">
-        <h1>Kontaktní údaje</h1>
-        <p>Zadejte údaje, kam vám balíček zašleme a na koho vystavíme fakturu.</p>
+        <h1>Doručení a fakturace</h1>
+        <p>Vyberte způsob doručení a vyplňte své údaje.</p>
+
+        <label>Způsob doručení</label>
+        <div class="shipping-methods">
+            <div class="ship-option active" id="opt-point" onclick="setShipMode('point')">
+                Výdejní místo <span class="ship-price">75 Kč</span>
+            </div>
+            <div class="ship-option" id="opt-address" onclick="setShipMode('address')">
+                Na adresu <span class="ship-price">105 Kč</span>
+            </div>
+        </div>
         
         <div class="row">
             <div class="form-group"><label>Jméno</label><input type="text" id="f-name" placeholder="Jan"></div>
             <div class="form-group"><label>Příjmení</label><input type="text" id="f-surname" placeholder="Novák"></div>
         </div>
-        
-        <div class="form-group"><label>Telefon (pro dopravce)</label><input type="tel" id="f-phone" placeholder="+420 777 123 456"></div>
-        <div class="form-group"><label>Ulice a č.p.</label><input type="text" id="f-street" placeholder="Vodičkova 123/1"></div>
-        
+        <div class="form-group"><label>Telefon</label><input type="tel" id="f-phone" placeholder="+420 777 123 456"></div>
+        <div class="form-group"><label>Ulice a č.p.</label><input type="text" id="f-street" placeholder="Vodičkova 1"></div>
         <div class="row">
             <div class="form-group"><label>Město</label><input type="text" id="f-city" placeholder="Praha"></div>
             <div class="form-group"><label>PSČ</label><input type="text" id="f-zip" placeholder="110 00"></div>
@@ -72,36 +80,30 @@
         </div>
 
         <div id="company-box" class="company-fields">
-            <div class="form-group"><label>IČO</label><input type="text" id="f-ico" placeholder="Zadejte IČO" onblur="fetchAres()"></div>
+            <div class="form-group"><label>IČO</label><input type="text" id="f-ico" placeholder="IČO" onblur="fetchAres()"></div>
             <div class="form-group"><label>Název firmy</label><input type="text" id="f-company-name" readonly style="background:#e2e8f0;"></div>
-            <div class="form-group"><label>DIČ (nepovinné)</label><input type="text" id="f-dic" placeholder="CZ12345678"></div>
         </div>
 
-        <button class="btn" id="btn-to-transport">VYBRAT BALÍKOVNU</button>
+        <button class="btn" id="btn-next">POKRAČOVAT</button>
     </div>
 
     <div id="confirm-ui" style="display:none; text-align: center;">
         <h1>Shrnutí objednávky</h1>
-        <p>Zkontrolujte si prosím zadané údaje před finálním potvrzením.</p>
-        
         <div id="rekap-preview" class="rekap-box"></div>
-
-        <button class="btn" id="btn-final-confirm" style="background: var(--success);">ZÁVAZNĚ POTVRDIT A DOKONČIT</button>
-        <button class="btn btn-secondary" onclick="location.reload()">UPRAVIT ÚDAJE</button>
+        <button class="btn" id="btn-final-confirm" style="background: var(--success);">POTVRDIT ÚDAJE</button>
+        <button class="btn" style="background:transparent; color:#64748b; margin-top:0;" onclick="location.reload()">ZPĚT</button>
     </div>
 
     <div id="done-ui" style="display:none; text-align: center;">
-        <div style="font-size: 3rem; color: #10b981; margin-bottom: 15px;">✅</div>
+        <div style="font-size: 3rem; margin-bottom: 15px;">✅</div>
         <h1>Hotovo!</h1>
-        <p>Vaše údaje byly v pořádku spárovány s objednávkou.</p>
-        <div id="rekapitulace-final" class="rekap-box"></div>
+        <p>Údaje byly uloženy. Na e-mail vám brzy přijdou instrukce k platbě.</p>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
@@ -112,11 +114,17 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
 
+    let shipMode = 'point'; // 'point' nebo 'address'
     let temporaryData = null;
+
+    window.setShipMode = (mode) => {
+        shipMode = mode;
+        document.getElementById('opt-point').classList.toggle('active', mode === 'point');
+        document.getElementById('opt-address').classList.toggle('active', mode === 'address');
+    };
 
     window.toggleCompany = () => {
         document.getElementById('company-box').style.display = document.getElementById('f-is-company').value === 'yes' ? 'block' : 'none';
@@ -124,44 +132,18 @@
 
     window.fetchAres = async () => {
         const ico = document.getElementById('f-ico').value.trim();
-        if (ico.length < 8) return;
-        try {
-            const res = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ico}`);
-            if (res.ok) {
-                const d = await res.json();
-                document.getElementById('f-company-name').value = d.obchodniJmeno;
-            }
-        } catch (e) {}
+        if (ico.length >= 8) {
+            try {
+                const res = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ico}`);
+                if (res.ok) {
+                    const d = await res.json();
+                    document.getElementById('f-company-name').value = d.obchodniJmeno;
+                }
+            } catch (e) {}
+        }
     };
 
-    async function init() {
-        if (!orderId) return;
-        try {
-            await signInAnonymously(auth);
-            const snap = await getDoc(doc(db, "objednavky", orderId));
-            if (snap.exists() && snap.data().status_kompletni) {
-                renderRekap(snap.data(), 'rekapitulace-final');
-                document.getElementById('details-ui').style.display = 'none';
-                document.getElementById('done-ui').style.display = 'block';
-            }
-        } catch (e) {}
-    }
-
-    function renderRekap(data, targetId) {
-        document.getElementById(targetId).innerHTML = `
-            <div class="rekap-row"><span>Příjemce:</span> <strong>${data.zakaznik_jmeno}</strong></div>
-            <div class="rekap-row"><span>Telefon:</span> <strong>${data.zakaznik_tel}</strong></div>
-            <div class="rekap-row"><span>Fakturace:</span> <strong>${data.zakaznik_ulice}, ${data.zakaznik_mesto}</strong></div>
-            ${data.firma_nazev ? `<div class="rekap-row"><span>Firma:</span> <strong>${data.firma_nazev} (IČ: ${data.firma_ico})</strong></div>` : ''}
-            <div class="rekap-row"><span>Doprava:</span> <strong style="color:var(--primary)">${data.shipAddress}</strong></div>
-        `;
-    }
-
-    // --- BALÍKOVNA LOGIKA ---
-    const balikovnaModal = document.getElementById('balikovna-modal');
-    const balikovnaIframe = document.getElementById('balikovna-iframe');
-
-    document.getElementById('btn-to-transport').onclick = () => {
+    document.getElementById('btn-next').onclick = () => {
         const fields = {
             name: document.getElementById('f-name').value,
             surname: document.getElementById('f-surname').value,
@@ -172,72 +154,75 @@
         };
 
         if (!fields.name || !fields.surname || !fields.phone || !fields.street || !fields.city) {
-            alert("Prosím vyplňte všechna pole včetně telefonu."); return;
+            alert("Vyplňte prosím všechny údaje."); return;
         }
 
-        // Otevřeme widget Balíkovny
-        balikovnaIframe.src = "https://b2c.cpost.cz/locations/?type=BALIKOVNY";
-        balikovnaModal.style.display = 'flex';
+        if (shipMode === 'point') {
+            document.getElementById('balikovna-iframe').src = "https://b2c.cpost.cz/locations/?type=BALIKOVNY";
+            document.getElementById('balikovna-modal').style.display = 'flex';
+        } else {
+            // Přímé doručení na adresu
+            prepareSummary({ name: "Doručení na adresu", street: fields.street, city: fields.city, price: 105 });
+        }
     };
 
-    // Naslouchání zprávě z Balíkovny
     window.addEventListener("message", (event) => {
         if (event.data.message === "vypost-location-selected") {
+            document.getElementById('balikovna-modal').style.display = 'none';
             const point = event.data.location;
-            const fields = {
-                name: document.getElementById('f-name').value,
-                surname: document.getElementById('f-surname').value,
-                phone: document.getElementById('f-phone').value,
-                street: document.getElementById('f-street').value,
-                city: document.getElementById('f-city').value,
-                zip: document.getElementById('f-zip').value
-            };
-
-            temporaryData = {
-                zakaznik_jmeno: `${fields.name} ${fields.surname}`,
-                zakaznik_tel: fields.phone,
-                zakaznik_ulice: fields.street,
-                zakaznik_mesto: fields.city,
-                zakaznik_psc: fields.zip,
-                firma_nazev: document.getElementById('f-company-name').value || "",
-                firma_ico: document.getElementById('f-ico').value || "",
-                firma_dic: document.getElementById('f-dic').value || "",
-                shipAddress: `Balíkovna: ${point.name}, ${point.street}, ${point.city}`,
-                pobocka_id: point.id,
-                status_kompletni: true,
-                datum_dokonceni: new Date().toISOString()
-            };
-
-            balikovnaModal.style.display = 'none';
-            document.getElementById('details-ui').style.display = 'none';
-            document.getElementById('confirm-ui').style.display = 'block';
-            renderRekap(temporaryData, 'rekap-preview');
+            prepareSummary({ name: `Balíkovna: ${point.name}`, street: point.street, city: point.city, price: 75, id: point.id });
         }
     });
 
-    // Zavření modalu při kliknutí mimo iframe
-    balikovnaModal.onclick = (e) => {
-        if (e.target === balikovnaModal) balikovnaModal.style.display = 'none';
-    };
+    function prepareSummary(shipInfo) {
+        const fields = {
+            name: document.getElementById('f-name').value,
+            surname: document.getElementById('f-surname').value,
+            phone: document.getElementById('f-phone').value,
+            street: document.getElementById('f-street').value,
+            city: document.getElementById('f-city').value,
+            zip: document.getElementById('f-zip').value
+        };
+
+        temporaryData = {
+            zakaznik_jmeno: `${fields.name} ${fields.surname}`,
+            zakaznik_tel: fields.phone,
+            zakaznik_ulice: fields.street,
+            zakaznik_mesto: fields.city,
+            zakaznik_psc: fields.zip,
+            firma_nazev: document.getElementById('f-company-name').value || "",
+            firma_ico: document.getElementById('f-ico').value || "",
+            shipAddress: shipInfo.name + ", " + shipInfo.street + ", " + shipInfo.city,
+            shipPrice: shipInfo.price,
+            pobocka_id: shipInfo.id || "ADRESA",
+            status_kompletni: true,
+            datum_dokonceni: new Date().toISOString()
+        };
+
+        document.getElementById('details-ui').style.display = 'none';
+        document.getElementById('confirm-ui').style.display = 'block';
+        
+        document.getElementById('rekap-preview').innerHTML = `
+            <div class="rekap-row"><span>Příjemce:</span> <strong>${temporaryData.zakaznik_jmeno}</strong></div>
+            <div class="rekap-row"><span>Doprava:</span> <strong>${shipInfo.name}</strong></div>
+            <div class="rekap-row"><span>Cena dopravy:</span> <strong>${shipInfo.price} Kč</strong></div>
+            <div class="rekap-row"><span>Platba:</span> <strong>Převodem (zdarma)</strong></div>
+        `;
+    }
 
     document.getElementById('btn-final-confirm').onclick = async () => {
-        if (!temporaryData) return;
         document.getElementById('confirm-ui').style.display = 'none';
         document.getElementById('loading-ui').style.display = 'flex';
-
         try {
             await updateDoc(doc(db, "objednavky", orderId), temporaryData);
-            renderRekap(temporaryData, 'rekapitulace-final');
             document.getElementById('loading-ui').style.display = 'none';
             document.getElementById('done-ui').style.display = 'block';
         } catch (e) {
-            alert("Chyba při ukládání: " + e.message);
+            alert("Chyba: " + e.message);
             document.getElementById('loading-ui').style.display = 'none';
             document.getElementById('confirm-ui').style.display = 'block';
         }
     };
-
-    init();
 </script>
 </body>
 </html>
