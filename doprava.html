@@ -39,7 +39,6 @@
         .logo { font-size: 24px; font-weight: 900; margin-bottom: 30px; letter-spacing: 2px; color: var(--text-dark); }
         .logo span { color: var(--primary); }
 
-        /* Stavy - schované v základu */
         #loading-ui, #selection-ui, #done-ui, #error-ui { display: none; }
 
         .btn { 
@@ -82,6 +81,7 @@
             border-radius: 16px;
             margin: 20px 0;
             font-weight: 700;
+            color: var(--primary);
         }
 
         .loader { 
@@ -99,13 +99,13 @@
 
         <div id="loading-ui">
             <div class="loader"></div>
-            <p style="margin-top: 20px;">Načítám detaily objednávky...</p>
+            <p style="margin-top: 20px;">Zpracovávám...</p>
         </div>
 
         <div id="selection-ui">
             <div class="status-badge badge-waiting">Doprava nevybrána</div>
             <h2>Kam model pošleme?</h2>
-            <p>Vyberte si prosím výdejní místo v síti Zásilkovna. Jakmile pobočku zvolíte, začneme s tiskem.</p>
+            <p>Vyberte si prosím výdejní místo Zásilkovny. Po výběru pobočky se nám data okamžitě propíšou do systému.</p>
             <button id="btn-pick" class="btn">📍 Vybrat výdejní místo</button>
         </div>
 
@@ -114,12 +114,12 @@
             <h2>Máme hotovo!</h2>
             <p>Váš model doručíme na adresu:</p>
             <div id="display-pobocka" class="pobocka-box">---</div>
-            <p style="font-size: 13px;">O dalším postupu vás budeme informovat e-mailem.</p>
+            <p style="font-size: 13px;">Nyní můžete toto okno zavřít. Brzy vás budeme kontaktovat ohledně platby.</p>
         </div>
 
         <div id="error-ui">
             <h2 style="color: #e11d48;">Chyba ❌</h2>
-            <p id="error-text">Odkaz není platný.</p>
+            <p id="error-text">Odkaz není platný nebo vypršel.</p>
         </div>
     </div>
 
@@ -138,6 +138,9 @@
     const db = getFirestore(app);
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
+
+    // Tvůj Cloudflare Worker pro synchronizaci
+    const WORKER_URL = "https://emailoveakce.bilcusadam.workers.dev/";
 
     const ui = {
         loading: document.getElementById('loading-ui'),
@@ -164,8 +167,9 @@
 
             if (snap.exists()) {
                 const data = snap.data();
-                if (data.pobocka && data.pobocka.trim() !== "") {
-                    document.getElementById('display-pobocka').innerText = data.pobocka;
+                // Kontrola pole shipAddress (to používá tvoje admin verze)
+                if (data.shipAddress && data.shipAddress.includes("Zásilkovna")) {
+                    document.getElementById('display-pobocka').innerText = data.shipAddress;
                     showUI('done');
                 } else {
                     showUI('selection');
@@ -175,29 +179,47 @@
                 document.getElementById('error-text').innerText = "Objednávka nenalezena.";
             }
         } catch (e) {
+            console.error(e);
             showUI('error');
-            document.getElementById('error-text').innerText = "Chyba databáze.";
+            document.getElementById('error-text').innerText = "Chyba při načítání dat.";
         }
     }
 
     document.getElementById('btn-pick').onclick = () => {
+        // Používám tvůj API klíč pro Zásilkovnu z kódu
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
                 showUI('loading');
+                const fullAddress = `Zásilkovna: ${point.name}, ${point.street}, ${point.city}`;
+                
                 try {
+                    // 1. Uložíme přímo do Firebase (pro jistotu)
                     await updateDoc(doc(db, "objednavky", orderId), {
-                        pobocka: point.name,
-                        pobocka_adresa: point.street + ", " + point.city,
-                        stav: "doprava_vybrana" 
+                        shipAddress: fullAddress,
+                        pobocka_id: point.id,
+                        stav: "nová" // Ponecháme stav nebo změníme dle potřeby
                     });
-                    document.getElementById('display-pobocka').innerText = point.name;
+
+                    // 2. Pošleme informaci Workeru (volitelné, ale dobré pro synchronizaci)
+                    await fetch(WORKER_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            action: "save_delivery",
+                            orderId: orderId,
+                            address: fullAddress
+                        })
+                    });
+
+                    document.getElementById('display-pobocka').innerText = fullAddress;
                     showUI('done');
                 } catch (e) {
-                    alert("Chyba při ukládání!");
+                    console.error(e);
+                    alert("Chyba při ukládání pobočky. Zkuste to prosím znovu.");
                     showUI('selection');
                 }
             }
-        }, { country: "cz" });
+        }, { country: "cz", language: "cs" });
     };
 
     init();
