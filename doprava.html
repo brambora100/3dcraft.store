@@ -3,181 +3,539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doručení a fakturace | 3DCRAFT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>3DCRAFT OS | Ultimate Control v13.5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     
     <style>
-        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --border: #e2e8f0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
-        h1 { font-weight: 800; margin-bottom: 10px; font-size: 1.5rem; text-align: center; }
-        p { color: #64748b; line-height: 1.6; text-align: center; margin-bottom: 25px; }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; color: #475569; }
-        input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; }
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .company-fields { display: none; background: #f1f5f9; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #e2e8f0; }
-        .btn { background: var(--primary); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; margin-top: 20px; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
-        #loading-ui { display: none; flex-direction: column; align-items: center; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .rekap-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        :root { 
+            --primary: #6366f1; --primary-light: #eef2ff; --bg: #f8fafc; 
+            --card: #ffffff; --text-main: #0f172a; --text-muted: #64748b; 
+            --border: #e2e8f0; --success: #10b981; --danger: #ef4444;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        .hidden { display: none !important; }
+
+        .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 15px 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .nav-tabs { display: flex; gap: 10px; }
+        .tab-btn { padding: 10px 20px; border-radius: 12px; border: none; background: transparent; cursor: pointer; font-weight: 700; color: var(--text-muted); transition: 0.2s; }
+        .tab-btn.active { background: var(--primary-light); color: var(--primary); }
+
+        .card { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .main-grid { display: grid; grid-template-columns: 1fr 450px; gap: 25px; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; }
+        th { padding: 15px 25px; background: #fcfcfd; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); text-align: left; }
+        td { padding: 15px 25px; border-bottom: 1px solid #f8fafc; font-size: 0.9rem; }
+        tr.order-row:hover { background: #f8faff; cursor: pointer; }
+
+        label { display: block; font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 12px 0 4px 0; }
+        input, select, textarea { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: #fbfcfd; font-family: inherit; box-sizing: border-box; font-size: 0.9rem; }
+        input:focus { border-color: var(--primary); outline: none; background: white; }
+
+        .ares-wrapper { position: relative; }
+        #ares-results { 
+            position: absolute; top: 100%; left: 0; right: 0; background: white; 
+            border: 1px solid var(--border); border-radius: 10px; z-index: 100; 
+            max-height: 250px; overflow-y: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .ares-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; line-height: 1.4; }
+        .ares-item:hover { background: var(--primary-light); }
+        .ares-item b { color: var(--primary); display: block; font-size: 0.75rem; }
+
+        .pill { padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .s-nová { background: #eef2ff; color: #4338ca; }
+        .s-tiskne { background: #fffbeb; color: #b45309; }
+        .s-hotovo { background: #ecfdf5; color: #047857; }
+        .s-odesláno { background: #fdf2f8; color: #be185d; }
+
+        .id-badge { font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; color: #475569; }
+
+        .mail-btn { padding: 10px; border-radius: 10px; border: 1px solid var(--primary); background: white; color: var(--primary); cursor: pointer; font-weight: 800; font-size: 0.7rem; transition: 0.2s; }
+        .mail-btn:hover { background: var(--primary); color: white; }
+
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 30px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; padding: 40px; }
+
+        .compact-upload { background: #f8fafc; border: 2px dashed var(--border); border-radius: 12px; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.2s; margin-bottom: 5px; }
+        .compact-upload:hover { border-color: var(--primary); background: var(--primary-light); }
+        .file-name-display { font-size: 11px; color: var(--success); font-weight: 700; text-align: center; display: block; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div id="loading-ui"><div class="spinner"></div><p>Ukládám data do systému...</p></div>
-
-    <div id="details-ui">
-        <h1>Kontaktní a fakturační údaje</h1>
-        <p>Tyto údaje budou použity pro doručení a fakturaci.</p>
-        
-        <div class="row">
-            <div class="form-group"><label>Jméno</label><input type="text" id="f-name" placeholder="Jan"></div>
-            <div class="form-group"><label>Příjmení</label><input type="text" id="f-surname" placeholder="Novák"></div>
-        </div>
-        
-        <div class="form-group"><label>Telefon (pro dopravce)</label><input type="tel" id="f-phone" placeholder="+420 777 123 456"></div>
-        <div class="form-group"><label>Ulice a č.p.</label><input type="text" id="f-street" placeholder="Vodičkova 123/1"></div>
-        
-        <div class="row">
-            <div class="form-group"><label>Město</label><input type="text" id="f-city" placeholder="Praha"></div>
-            <div class="form-group"><label>PSČ</label><input type="text" id="f-zip" placeholder="110 00"></div>
+<div class="container">
+    <div id="dashboard-section">
+        <div class="header-nav">
+            <h1 style="margin:0; font-weight:900; font-size:1.4rem;">3D<span style="color:var(--primary)">CRAFT</span></h1>
+            <div class="nav-tabs">
+                <button class="tab-btn active" id="tab-btn-orders" onclick="switchTab('orders')">📦 Přehled Zakázek</button>
+                <button class="tab-btn" id="tab-btn-new" onclick="switchTab('new')">➕ Nová Zakázka</button>
+            </div>
+            <div style="font-weight:700; font-size:0.8rem; color:var(--text-muted);">ADMIN ERP v13.5</div>
         </div>
 
-        <div class="form-group">
-            <label>Typ nákupu</label>
-            <select id="f-is-company" onchange="toggleCompany()">
-                <option value="no">Soukromá osoba</option>
-                <option value="yes">Firma / Živnostník</option>
-            </select>
+        <div id="tab-orders">
+            <div class="card" style="padding:0; overflow:hidden;">
+                <div style="padding:15px 25px; border-bottom:1px solid var(--border);">
+                    <input type="text" id="order-search" placeholder="🔍 Vyhledat zakázku, ID, firmu nebo barvu..." oninput="renderTable()">
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID / Projekt</th>
+                            <th>Firma / Zákazník</th>
+                            <th>Barva / Doprava</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Cena Celkem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div id="company-box" class="company-fields">
-            <div class="form-group"><label>IČO</label><input type="text" id="f-ico" placeholder="Zadejte IČO" onblur="fetchAres()"></div>
-            <div class="form-group"><label>Název firmy</label><input type="text" id="f-company-name" readonly style="background:#e2e8f0;"></div>
-            <div class="form-group"><label>DIČ (nepovinné)</label><input type="text" id="f-dic" placeholder="CZ12345678"></div>
-        </div>
+        <div id="tab-new" class="main-grid hidden">
+            <div class="card">
+                <h3 style="margin-top:0">🛠️ Parametry tisku</h3>
+                <div style="border: 2px dashed var(--border); padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; background: #fbfcfd;" onclick="document.getElementById('file-input').click()">
+                    <input type="file" id="file-input" style="display:none" onchange="handleFileUpload(this)">
+                    <span style="font-size:2rem">📄</span>
+                    <p id="file-status-text" style="font-weight:700; margin:5px 0;">Nahrát STL / STEP soubor</p>
+                </div>
 
-        <button class="btn" id="btn-next">VYBRAT DOPRAVU A POTVRDIT</button>
+                <label>Název projektu *</label>
+                <input type="text" id="proj-name" placeholder="Např: Redukce ventilu">
+
+                <label>Odkaz na model od zákazníka</label>
+                <input type="text" id="proj-link" placeholder="https://www.printables.com/model/...">
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>Materiál</label>
+                        <select id="mat-select" onchange="recalc()">
+                            <option value="PLA">PLA</option>
+                            <option value="PETG">PETG</option>
+                            <option value="ABS">ABS</option>
+                            <option value="ASA">ASA</option>
+                        </select>
+                    </div>
+                    <div><label>Barva</label><input type="text" id="proj-color" placeholder="Černá, RAL..."></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>Využití</label>
+                        <select id="proj-env">
+                            <option value="Interiér">🏠 Interiér</option>
+                            <option value="Exteriér">☀️ Exteriér</option>
+                            <option value="Oboje">🔄 Oboje</option>
+                        </select>
+                    </div>
+                    <div><label>Odhadovaná váha (g)</label><input type="number" id="weight-input" value="0" oninput="recalc()"></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>Počet kusů</label><input type="number" id="pcs-input" value="1" oninput="recalc()"></div>
+                    <div><label>Ruční cena za kus (volitelné)</label><input type="number" id="manual-price" placeholder="Přebít výpočet?" oninput="recalc()"></div>
+                </div>
+                
+                <label>Poznámka k tisku</label>
+                <textarea id="proj-note" rows="3" placeholder="Podpěry, výplň 20%..."></textarea>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h3 style="margin-top:0">📄 Fakturační údaje</h3>
+                    <label>Hledat firmu podle názvu</label>
+                    <div class="ares-wrapper">
+                        <input type="text" id="ares-search-name" placeholder="Začněte psát název firmy..." autocomplete="off">
+                        <div id="ares-results" class="hidden"></div>
+                    </div>
+
+                    <label>Firma / Jméno</label><input type="text" id="cust-name">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div><label>IČO</label><input type="text" id="cust-ico"></div>
+                        <div><label>DIČ</label><input type="text" id="cust-dic"></div>
+                    </div>
+                    <label>Ulice a č.p.</label><input type="text" id="cust-address">
+                    <div style="display:grid; grid-template-columns: 1fr 100px; gap:10px;">
+                        <div><label>Město</label><input type="text" id="cust-city"></div>
+                        <div><label>PSČ</label><input type="text" id="cust-psc"></div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div><label>E-mail</label><input type="email" id="cust-email"></div>
+                        <div><label>Telefon</label><input type="tel" id="cust-phone"></div>
+                    </div>
+                </div>
+
+                <div style="background:var(--primary); color:white; padding:25px; border-radius:18px; text-align:center;">
+                    <small style="opacity:0.8; font-weight:800;">KONEČNÁ CENA (BEZ DOPRAVY)</small>
+                    <div style="font-size:2.2rem; font-weight:900;" id="final-price-display">0 Kč</div>
+                    <small id="base-price-info">Základ: 0 Kč</small>
+                </div>
+                <button id="btn-create" onclick="saveOrder()" style="background:var(--primary); color:white; border:none; padding:18px; width:100%; border-radius:15px; margin-top:15px; font-weight:800; cursor:pointer;">VYTVOŘIT ZAKÁZKU</button>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div id="done-ui" style="display:none; text-align: center;">
-        <div style="font-size: 3rem; color: #10b981; margin-bottom: 15px;">✅</div>
-        <h1>Hotovo!</h1>
-        <p>Vaše údaje byly v pořádku spárovány s objednávkou.</p>
-        <div id="rekapitulace" style="text-align: left; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
+<div id="detail-modal" class="modal hidden">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <h2 style="margin:0">Zakázka: <span id="det-header-title" style="color:var(--primary)"></span></h2>
+                <span id="det-order-id-label" class="id-badge" style="font-size: 1rem; padding: 5px 10px;"></span>
+            </div>
+            <button onclick="closeModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer;">✕</button>
+        </div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
+            <div>
+                <h4 style="margin:0 0 15px 0; color:var(--primary)">🛠️ Výroba & E-maily</h4>
+                <label>Stav zakázky</label>
+                <select id="det-stav" style="background:var(--primary-light); font-weight:800; color:var(--primary); margin-bottom:20px;">
+                    <option value="nová">Nová</option>
+                    <option value="tiskne">Tiskne se</option>
+                    <option value="hotovo">Hotovo</option>
+                    <option value="odesláno">Odesláno</option>
+                </select>
+                
+                <div style="background:#f1f5f9; padding:15px; border-radius:16px; margin-bottom:20px;">
+                    <label style="margin-top:0; margin-bottom:8px;">Faktura pro e-mail (PDF)</label>
+                    <div class="compact-upload" onclick="document.getElementById('det-pdf-file').click()">
+                        <span>📄</span>
+                        <b>Klikněte pro nahrání PDF</b>
+                        <input type="file" id="det-pdf-file" accept=".pdf" style="display:none;" onchange="updatePdfName(this)">
+                    </div>
+                    <span id="pdf-file-name" class="file-name-display">Žádný soubor nevybrán</span>
+                </div>
+
+                <div style="margin: 15px 0; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                    <button onclick="sendWorkerEmail('naceneni')" class="mail-btn">💰 1. Nacenění</button>
+                    <button onclick="sendWorkerEmail('platba')" class="mail-btn" style="background: var(--primary-light);">💳 2. Platba</button>
+                    <button onclick="sendWorkerEmail('odeslano')" class="mail-btn">🚚 3. Odesláno</button>
+                </div>
+
+                <label>Název Projektu</label><input type="text" id="det-proj-name">
+                <label>Odkaz na model</label><input type="text" id="det-proj-link">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>Materiál</label><input type="text" id="det-material"></div>
+                    <div><label>Barva</label><input type="text" id="det-color"></div>
+                </div>
+                <label>Cena Tisku (Bez dopravy!)</label><input type="number" id="det-price">
+                <label>Poznámka k tisku (vč. využití a ks)</label>
+                <textarea id="det-note" rows="3"></textarea>
+            </div>
+
+            <div>
+                <div style="background:#eef2ff; padding:20px; border-radius:20px; border:1px solid #c7d2fe; margin-bottom:20px;">
+                    <h4 style="margin:0 0 10px 0; color:var(--primary)">📍 Doprava (Zásilkovna)</h4>
+                    <div id="det-ship-address" style="font-weight:800; margin-bottom:12px; font-size:0.9rem;">Doprava zatím nevybrána</div>
+                    <button onclick="pickPacketaForCustomer()" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:800; width:100%;">VYBRAT POBOČKU RUČNĚ</button>
+                </div>
+
+                <h4 style="margin:0 0 10px 0;">📄 Zákazník</h4>
+                <label>Jméno / Firma</label><input type="text" id="det-cust-name">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>IČO</label><input type="text" id="det-ico"></div>
+                    <div><label>DIČ</label><input type="text" id="det-dic"></div>
+                </div>
+                <label>Kompletní Fakturační Adresa</label>
+                <textarea id="det-full-address" rows="2" placeholder="Ulice, Město, PSČ..."></textarea>
+                
+                <label>E-mail</label><input type="email" id="det-email">
+                <label>Telefon</label><input type="tel" id="det-phone">
+            </div>
+        </div>
+
+        <div style="margin-top:25px; display:flex; justify-content:space-between;">
+            <button id="del-det-btn" style="color:var(--danger); border:none; background:none; cursor:pointer; font-weight:700;">SMAZAT ZAKÁZKU</button>
+            <button id="save-det-btn" style="background:var(--primary); color:white; border:none; padding:15px 35px; border-radius:12px; font-weight:800; cursor:pointer;">ULOŽIT ZMĚNY</button>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
-        authDomain: "dcraft-748f9.firebaseapp.com",
-        projectId: "dcraft-748f9",
-        appId: "1:761752992060:web:b84c4687cc3dff6afb8639"
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY", 
+        authDomain: "dcraft-748f9.firebaseapp.com", 
+        projectId: "dcraft-748f9", 
+        appId: "1:761752992060:web:b84c4687cc3dff6afb8639" 
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('id');
+    const WORKER_URL = "https://emailoveakce.bilcusadam.workers.dev/";
 
-    window.toggleCompany = () => {
-        document.getElementById('company-box').style.display = document.getElementById('f-is-company').value === 'yes' ? 'block' : 'none';
-    };
+    let allOrders = [];
+    let activeId = null;
+    signInAnonymously(auth);
 
-    window.fetchAres = async () => {
-        const ico = document.getElementById('f-ico').value.trim();
-        if (ico.length < 8) return;
-        try {
-            const res = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ico}`);
-            if (res.ok) {
-                const d = await res.json();
-                document.getElementById('f-company-name').value = d.obchodniJmeno;
-            }
-        } catch (e) {}
-    };
+    // ARES PROXY
+    const aresSearchInput = document.getElementById('ares-search-name');
+    const aresResultsDiv = document.getElementById('ares-results');
 
-    async function init() {
-        if (!orderId) return;
-        try {
-            await signInAnonymously(auth);
-            const snap = await getDoc(doc(db, "objednavky", orderId));
-            if (snap.exists() && snap.data().status_kompletni) {
-                renderRekap(snap.data());
-                document.getElementById('details-ui').style.display = 'none';
-                document.getElementById('done-ui').style.display = 'block';
-            }
-        } catch (e) {}
-    }
-
-    function renderRekap(data) {
-        document.getElementById('rekapitulace').innerHTML = `
-            <div class="rekap-row"><span>Jméno:</span> <strong>${data.zakaznik_jmeno}</strong></div>
-            <div class="rekap-row"><span>Tel:</span> <strong>${data.zakaznik_tel}</strong></div>
-            <div class="rekap-row"><span>Adresa:</span> <strong>${data.zakaznik_ulice}, ${data.zakaznik_mesto}</strong></div>
-            <div class="rekap-row"><span>Doprava:</span> <strong style="color:var(--primary)">${data.shipAddress}</strong></div>
-        `;
-    }
-
-    document.getElementById('btn-next').onclick = () => {
-        const fields = {
-            name: document.getElementById('f-name').value,
-            surname: document.getElementById('f-surname').value,
-            phone: document.getElementById('f-phone').value,
-            street: document.getElementById('f-street').value,
-            city: document.getElementById('f-city').value,
-            zip: document.getElementById('f-zip').value
-        };
-
-        if (!fields.name || !fields.surname || !fields.phone || !fields.street || !fields.city) {
-            alert("Prosím vyplňte všechna pole včetně telefonu."); return;
+    aresSearchInput.addEventListener('input', async (e) => {
+        const val = e.target.value;
+        if (val.length < 3) {
+            aresResultsDiv.classList.add('hidden');
+            return;
         }
 
+        try {
+            const res = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "ares_proxy", ico: val })
+            });
+            const data = await res.json();
+            const firmy = data.ekonomickeSubjekty || [];
+            
+            if (firmy.length > 0) {
+                aresResultsDiv.innerHTML = firmy.map(f => `
+                    <div class="ares-item" onclick="selectAresCompany('${f.ico}', '${f.obchodniJmeno.replace(/'/g, "\\'")}')">
+                        <b>IČO: ${f.ico}</b>
+                        ${f.obchodniJmeno}
+                    </div>
+                `).join('');
+                aresResultsDiv.classList.remove('hidden');
+            } else {
+                aresResultsDiv.classList.add('hidden');
+            }
+        } catch (e) { console.error("ARES error", e); }
+    });
+
+    window.selectAresCompany = async (ico, jmeno) => {
+        aresResultsDiv.classList.add('hidden');
+        aresSearchInput.value = jmeno;
+        try {
+            const res = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "ares_proxy", ico: ico })
+            });
+            const data = await res.json();
+            const d = data.ekonomickeSubjekty ? data.ekonomickeSubjekty[0] : data;
+
+            document.getElementById('cust-name').value = d.obchodniJmeno || "";
+            document.getElementById('cust-ico').value = d.ico || "";
+            document.getElementById('cust-dic').value = d.dic || "";
+            if (d.sidlo) {
+                document.getElementById('cust-address').value = `${d.sidlo.nazevUlice || d.sidlo.nazevObce} ${d.sidlo.cisloDomovni || ""}`;
+                document.getElementById('cust-city').value = d.sidlo.nazevObce || "";
+                document.getElementById('cust-psc').value = d.sidlo.psc || "";
+            }
+        } catch(e) { console.log("ARES detail error", e); }
+    };
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.ares-wrapper')) aresResultsDiv.classList.add('hidden');
+    });
+
+    window.updatePdfName = (input) => {
+        const display = document.getElementById('pdf-file-name');
+        display.innerText = input.files[0] ? "✅ " + input.files[0].name : "Žádný soubor nevybrán";
+    };
+
+    window.switchTab = (t) => {
+        document.getElementById('tab-orders').classList.toggle('hidden', t!=='orders');
+        document.getElementById('tab-new').classList.toggle('hidden', t!=='new');
+        document.getElementById('tab-btn-orders').classList.toggle('active', t==='orders');
+        document.getElementById('tab-btn-new').classList.toggle('active', t==='new');
+    };
+
+    window.recalc = () => {
+        const mat = document.getElementById('mat-select').value;
+        const weight = parseFloat(document.getElementById('weight-input').value) || 0;
+        const pcs = parseInt(document.getElementById('pcs-input').value) || 1;
+        const manual = parseFloat(document.getElementById('manual-price').value);
+        const rates = { PLA: 2.2, PETG: 2.8, ABS: 4.0, ASA: 4.5 };
+        
+        let tiskBase = manual > 0 ? manual * pcs : Math.round((60 + (weight * rates[mat])) * pcs);
+
+        document.getElementById('final-price-display').innerText = tiskBase + " Kč";
+        document.getElementById('base-price-info').innerText = `Čistá cena za tisk: ${tiskBase} Kč`;
+    };
+
+    window.handleFileUpload = (i) => {
+        const f = i.files[0];
+        document.getElementById('proj-name').value = f.name.split('.')[0];
+        document.getElementById('file-status-text').innerText = "📎 " + f.name;
+        document.getElementById('weight-input').value = Math.max(10, Math.round(f.size / 24000));
+        recalc();
+    };
+
+    window.saveOrder = async () => {
+        const name = document.getElementById('proj-name').value;
+        const tiskCena = parseInt(document.getElementById('final-price-display').innerText);
+        const fullAddr = `${document.getElementById('cust-address').value}, ${document.getElementById('cust-city').value} ${document.getElementById('cust-psc').value}`;
+        
+        const vyuziti = document.getElementById('proj-env').value;
+        const mnozstvi = document.getElementById('pcs-input').value;
+        const puvodniPoznamka = document.getElementById('proj-note').value;
+        const finalniPoznamka = `VYUŽITÍ: ${vyuziti}\nMNOŽSTVÍ: ${mnozstvi} ks\n----------\n${puvodniPoznamka}`;
+
+        if(!name) return alert("Zadejte název!");
+        try {
+            await addDoc(collection(db, "objednavky"), {
+                nazev: name,
+                link: document.getElementById('proj-link').value || "",
+                zakaznik: document.getElementById('cust-name').value,
+                email: document.getElementById('cust-email').value,
+                phone: document.getElementById('cust-phone').value,
+                cena: tiskCena,
+                material: document.getElementById('mat-select').value,
+                barva: document.getElementById('proj-color').value || "Černá",
+                stav: "nová", 
+                shipAddress: "",
+                ico: document.getElementById('cust-ico').value,
+                dic: document.getElementById('cust-dic').value,
+                fakturacniAdresa: fullAddr,
+                poznamka: finalniPoznamka,
+                datum: serverTimestamp()
+            });
+            switchTab('orders');
+        } catch(e) { alert(e.message); }
+    };
+
+    onSnapshot(query(collection(db, "objednavky"), orderBy("datum", "desc")), s => {
+        allOrders = s.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderTable();
+    });
+
+    window.renderTable = () => {
+        const q = document.getElementById('order-search').value.toLowerCase();
+        const tbody = document.getElementById('orders-table');
+        tbody.innerHTML = '';
+        allOrders.filter(o => (o.nazev + (o.zakaznik||'') + o.id).toLowerCase().includes(q)).forEach(o => {
+            const tr = document.createElement('tr'); tr.className = 'order-row';
+            tr.onclick = () => openDetail(o);
+            tr.innerHTML = `
+                <td><span class="id-badge">${o.id.substring(0,8)}</span> <strong>${o.nazev}</strong></td>
+                <td>${o.zakaznik || o.zakaznik_jmeno || 'Neznámý'}</td>
+                <td><small>${o.shipAddress || '⚠️ Čeká na výběr'}</small></td>
+                <td><span class="pill s-${o.stav}">${o.stav}</span></td>
+                <td align="right"><strong>${o.cena} Kč</strong></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    };
+
+    window.openDetail = (o) => {
+        activeId = o.id;
+        document.getElementById('det-header-title').innerText = o.nazev;
+        document.getElementById('det-order-id-label').innerText = o.id;
+        document.getElementById('det-proj-name').value = o.nazev;
+        document.getElementById('det-proj-link').value = o.link || "";
+        document.getElementById('det-stav').value = o.stav;
+        document.getElementById('det-price').value = o.cena;
+        document.getElementById('det-email').value = o.email || "";
+        
+        // prioritní načítání z nového formuláře vs ruční zadání
+        document.getElementById('det-cust-name').value = o.firma_nazev || o.zakaznik_jmeno || o.zakaznik || "";
+        document.getElementById('det-phone').value = o.zakaznik_tel || o.phone || "";
+        document.getElementById('det-ico').value = o.firma_ico || o.ico || "";
+        document.getElementById('det-dic').value = o.firma_dic || o.dic || "";
+        
+        // Složení adresy pokud přišla z formuláře
+        let fullAddr = o.fakturacniAdresa || "";
+        if (o.zakaznik_ulice) {
+            fullAddr = `${o.zakaznik_ulice}, ${o.zakaznik_mesto} ${o.zakaznik_psc}`;
+        }
+        document.getElementById('det-full-address').value = fullAddr;
+
+        document.getElementById('det-material').value = o.material || "";
+        document.getElementById('det-color').value = o.barva || "";
+        document.getElementById('det-note').value = o.poznamka || "";
+        document.getElementById('det-ship-address').innerText = o.shipAddress || "Doprava zatím nevybrána";
+        document.getElementById('detail-modal').classList.remove('hidden');
+    };
+
+    window.pickPacketaForCustomer = () => {
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
-                document.getElementById('details-ui').style.display = 'none';
-                document.getElementById('loading-ui').style.display = 'flex';
-                
-                try {
-                    const finalData = {
-                        zakaznik_jmeno: `${fields.name} ${fields.surname}`,
-                        zakaznik_tel: fields.phone,
-                        zakaznik_ulice: fields.street,
-                        zakaznik_mesto: fields.city,
-                        zakaznik_psc: fields.zip,
-                        firma_nazev: document.getElementById('f-company-name').value || "",
-                        firma_ico: document.getElementById('f-ico').value || "",
-                        firma_dic: document.getElementById('f-dic').value || "",
-                        shipAddress: `Zásilkovna: ${point.name}, ${point.street}, ${point.city}`,
-                        pobocka_id: point.id,
-                        status_kompletni: true,
-                        datum_dokonceni: new Date().toISOString()
-                    };
-
-                    await updateDoc(doc(db, "objednavky", orderId), finalData);
-                    renderRekap(finalData);
-                    document.getElementById('loading-ui').style.display = 'none';
-                    document.getElementById('done-ui').style.display = 'block';
-                } catch (e) {
-                    alert("Chyba při ukládání: " + e.message);
-                    document.getElementById('loading-ui').style.display = 'none';
-                    document.getElementById('details-ui').style.display = 'block';
-                }
+                const addr = `Zásilkovna: ${point.name}, ${point.street}, ${point.city}`;
+                document.getElementById('det-ship-address').innerText = addr;
+                await updateDoc(doc(db, "objednavky", activeId), { shipAddress: addr });
             }
         }, { country: "cz", language: "cs" });
     };
 
-    init();
+    window.sendWorkerEmail = async (type) => {
+        const btn = event.target;
+        const email = document.getElementById('det-email').value;
+        const nazev = document.getElementById('det-proj-name').value;
+        const cena = document.getElementById('det-price').value;
+        const shipAddress = document.getElementById('det-ship-address').innerText;
+        const fileInput = document.getElementById('det-pdf-file');
+
+        if(!email) return alert("Chybí e-mail!");
+        btn.innerText = "⏳...";
+        
+        let attachments = [];
+        if(type === 'platba' && fileInput.files[0]) {
+            const base64 = await toBase64(fileInput.files[0]);
+            attachments.push({ 
+                content: base64.split(',')[1], 
+                filename: fileInput.files[0].name 
+            });
+        }
+
+        try {
+            await fetch(WORKER_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "send_specific_mail",
+                    mailType: type,
+                    email: email,
+                    nazev: nazev,
+                    cena: cena,
+                    orderId: activeId,
+                    shipAddress: shipAddress,
+                    attachments: attachments
+                })
+            });
+            alert("E-mail odeslán!");
+        } catch (e) { alert("Chyba!"); }
+        btn.innerText = "Odesláno ✅";
+    };
+
+    const toBase64 = f => new Promise((res, rej) => {
+        const r = new FileReader(); r.readAsDataURL(f);
+        r.onload = () => res(r.result); r.onerror = e => rej(e);
+    });
+
+    window.closeModal = () => document.getElementById('detail-modal').classList.add('hidden');
+
+    document.getElementById('save-det-btn').onclick = async () => {
+        await updateDoc(doc(db, "objednavky", activeId), {
+            stav: document.getElementById('det-stav').value,
+            nazev: document.getElementById('det-proj-name').value,
+            link: document.getElementById('det-proj-link').value,
+            cena: parseInt(document.getElementById('det-price').value),
+            zakaznik: document.getElementById('det-cust-name').value,
+            email: document.getElementById('det-email').value,
+            material: document.getElementById('det-material').value,
+            barva: document.getElementById('det-color').value,
+            ico: document.getElementById('det-ico').value,
+            dic: document.getElementById('det-dic').value,
+            fakturacniAdresa: document.getElementById('det-full-address').value,
+            poznamka: document.getElementById('det-note').value,
+            phone: document.getElementById('det-phone').value
+        });
+        closeModal();
+    };
+
+    document.getElementById('del-det-btn').onclick = async () => {
+        if(confirm("Smazat?")) { await deleteDoc(doc(db, "objednavky", activeId)); closeModal(); }
+    };
 </script>
 </body>
 </html>
