@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3DCRAFT OS | Ultimate Control v13</title>
+    <title>3DCRAFT OS | Ultimate Control v13.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     
@@ -51,6 +51,8 @@
         .s-hotovo { background: #ecfdf5; color: #047857; }
         .s-odesláno { background: #fdf2f8; color: #be185d; }
 
+        .id-badge { font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; color: #475569; }
+
         .mail-btn { padding: 10px; border-radius: 10px; border: 1px solid var(--primary); background: white; color: var(--primary); cursor: pointer; font-weight: 800; font-size: 0.7rem; transition: 0.2s; }
         .mail-btn:hover { background: var(--primary); color: white; }
 
@@ -72,18 +74,18 @@
                 <button class="tab-btn active" id="tab-btn-orders" onclick="switchTab('orders')">📦 Přehled Zakázek</button>
                 <button class="tab-btn" id="tab-btn-new" onclick="switchTab('new')">➕ Nová Zakázka</button>
             </div>
-            <div style="font-weight:700; font-size:0.8rem; color:var(--text-muted);">ADMIN ERP v13</div>
+            <div style="font-weight:700; font-size:0.8rem; color:var(--text-muted);">ADMIN ERP v13.5</div>
         </div>
 
         <div id="tab-orders">
             <div class="card" style="padding:0; overflow:hidden;">
                 <div style="padding:15px 25px; border-bottom:1px solid var(--border);">
-                    <input type="text" id="order-search" placeholder="🔍 Vyhledat zakázku, firmu nebo barvu..." oninput="renderTable()">
+                    <input type="text" id="order-search" placeholder="🔍 Vyhledat zakázku, ID, firmu nebo barvu..." oninput="renderTable()">
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Projekt</th>
+                            <th>ID / Projekt</th>
                             <th>Firma / Zákazník</th>
                             <th>Barva / Doprava</th>
                             <th>Status</th>
@@ -106,6 +108,9 @@
 
                 <label>Název projektu *</label>
                 <input type="text" id="proj-name" placeholder="Např: Redukce ventilu">
+
+                <label>Odkaz na model od zákazníka</label>
+                <input type="text" id="proj-link" placeholder="https://www.printables.com/model/...">
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div><label>Materiál</label>
@@ -165,9 +170,9 @@
                 </div>
 
                 <div style="background:var(--primary); color:white; padding:25px; border-radius:18px; text-align:center;">
-                    <small style="opacity:0.8; font-weight:800;">KONEČNÁ CENA (VČETNĚ DOPRAVY)</small>
-                    <div style="font-size:2.2rem; font-weight:900;" id="final-price-display">89 Kč</div>
-                    <small id="base-price-info">Základ: 0 Kč + Doprava: 89 Kč</small>
+                    <small style="opacity:0.8; font-weight:800;">KONEČNÁ CENA (BEZ DOPRAVY)</small>
+                    <div style="font-size:2.2rem; font-weight:900;" id="final-price-display">0 Kč</div>
+                    <small id="base-price-info">Základ: 0 Kč</small>
                 </div>
                 <button id="btn-create" onclick="saveOrder()" style="background:var(--primary); color:white; border:none; padding:18px; width:100%; border-radius:15px; margin-top:15px; font-weight:800; cursor:pointer;">VYTVOŘIT ZAKÁZKU</button>
             </div>
@@ -178,7 +183,10 @@
 <div id="detail-modal" class="modal hidden">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0">Zakázka: <span id="det-header-title" style="color:var(--primary)"></span></h2>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <h2 style="margin:0">Zakázka: <span id="det-header-title" style="color:var(--primary)"></span></h2>
+                <span id="det-order-id-label" class="id-badge" style="font-size: 1rem; padding: 5px 10px;"></span>
+            </div>
             <button onclick="closeModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer;">✕</button>
         </div>
         
@@ -210,6 +218,7 @@
                 </div>
 
                 <label>Název Projektu</label><input type="text" id="det-proj-name">
+                <label>Odkaz na model</label><input type="text" id="det-proj-link">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div><label>Materiál</label><input type="text" id="det-material"></div>
                     <div><label>Barva</label><input type="text" id="det-color"></div>
@@ -230,6 +239,9 @@
                     <div><label>IČO</label><input type="text" id="det-ico"></div>
                     <div><label>DIČ</label><input type="text" id="det-dic"></div>
                 </div>
+                <label>Kompletní Fakturační Adresa</label>
+                <textarea id="det-full-address" rows="2" placeholder="Ulice, Město, PSČ..."></textarea>
+                
                 <label>E-mail</label><input type="email" id="det-email">
                 <label>Telefon</label><input type="tel" id="det-phone">
             </div>
@@ -277,7 +289,7 @@
             const res = await fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "ares_proxy", ico: val }) // Worker teď zvládá i vyhledávání podle textu
+                body: JSON.stringify({ action: "ares_proxy", ico: val })
             });
             const data = await res.json();
             const firmy = data.ekonomickeSubjekty || [];
@@ -306,8 +318,6 @@
                 body: JSON.stringify({ action: "ares_proxy", ico: ico })
             });
             const data = await res.json();
-            
-            // Pokud worker vrátí detailní objekt (ekonomickeSubjekty[0])
             const d = data.ekonomickeSubjekty ? data.ekonomickeSubjekty[0] : data;
 
             document.getElementById('cust-name').value = d.obchodniJmeno || "";
@@ -345,10 +355,9 @@
         const rates = { PLA: 2.2, PETG: 2.8, ABS: 4.0, ASA: 4.5 };
         
         let tiskBase = manual > 0 ? manual * pcs : Math.round((60 + (weight * rates[mat])) * pcs);
-        let celkem = tiskBase + 89;
 
-        document.getElementById('final-price-display').innerText = celkem + " Kč";
-        document.getElementById('base-price-info').innerText = `Základ: ${tiskBase} Kč + Doprava: 89 Kč`;
+        document.getElementById('final-price-display').innerText = tiskBase + " Kč";
+        document.getElementById('base-price-info').innerText = `Čistá cena za tisk: ${tiskBase} Kč`;
     };
 
     window.handleFileUpload = (i) => {
@@ -361,23 +370,25 @@
 
     window.saveOrder = async () => {
         const name = document.getElementById('proj-name').value;
-        const finalPrice = parseInt(document.getElementById('final-price-display').innerText);
-        const tiskCena = finalPrice - 89;
+        const tiskCena = parseInt(document.getElementById('final-price-display').innerText);
+        const fullAddr = `${document.getElementById('cust-address').value}, ${document.getElementById('cust-city').value} ${document.getElementById('cust-psc').value}`;
 
         if(!name) return alert("Zadejte název!");
         try {
             await addDoc(collection(db, "objednavky"), {
                 nazev: name,
+                link: document.getElementById('proj-link').value || "",
                 zakaznik: document.getElementById('cust-name').value,
                 email: document.getElementById('cust-email').value,
                 phone: document.getElementById('cust-phone').value,
-                cena: tiskCena, // Ukládáme jen tisk, worker přičte dopravu
+                cena: tiskCena,
                 material: document.getElementById('mat-select').value,
                 barva: document.getElementById('proj-color').value || "Černá",
                 stav: "nová", 
                 shipAddress: "",
                 ico: document.getElementById('cust-ico').value,
                 dic: document.getElementById('cust-dic').value,
+                fakturacniAdresa: fullAddr,
                 datum: serverTimestamp()
             });
             switchTab('orders');
@@ -393,15 +404,15 @@
         const q = document.getElementById('order-search').value.toLowerCase();
         const tbody = document.getElementById('orders-table');
         tbody.innerHTML = '';
-        allOrders.filter(o => (o.nazev + (o.zakaznik||'')).toLowerCase().includes(q)).forEach(o => {
+        allOrders.filter(o => (o.nazev + (o.zakaznik||'') + o.id).toLowerCase().includes(q)).forEach(o => {
             const tr = document.createElement('tr'); tr.className = 'order-row';
             tr.onclick = () => openDetail(o);
             tr.innerHTML = `
-                <td><strong>${o.nazev}</strong></td>
+                <td><span class="id-badge">${o.id.substring(0,8)}</span> <strong>${o.nazev}</strong></td>
                 <td>${o.zakaznik || 'Neznámý'}</td>
                 <td><small>${o.shipAddress || '⚠️ Čeká na výběr'}</small></td>
                 <td><span class="pill s-${o.stav}">${o.stav}</span></td>
-                <td align="right"><strong>${o.cena + 89} Kč</strong></td>
+                <td align="right"><strong>${o.cena} Kč</strong></td>
             `;
             tbody.appendChild(tr);
         });
@@ -410,7 +421,9 @@
     window.openDetail = (o) => {
         activeId = o.id;
         document.getElementById('det-header-title').innerText = o.nazev;
+        document.getElementById('det-order-id-label').innerText = o.id;
         document.getElementById('det-proj-name').value = o.nazev;
+        document.getElementById('det-proj-link').value = o.link || "";
         document.getElementById('det-stav').value = o.stav;
         document.getElementById('det-price').value = o.cena;
         document.getElementById('det-email').value = o.email || "";
@@ -419,6 +432,7 @@
         document.getElementById('det-color').value = o.barva || "";
         document.getElementById('det-ico').value = o.ico || "";
         document.getElementById('det-dic').value = o.dic || "";
+        document.getElementById('det-full-address').value = o.fakturacniAdresa || "";
         document.getElementById('det-phone').value = o.phone || "";
         document.getElementById('det-ship-address').innerText = o.shipAddress || "Doprava zatím nevybrána";
         document.getElementById('detail-modal').classList.remove('hidden');
@@ -485,6 +499,7 @@
         await updateDoc(doc(db, "objednavky", activeId), {
             stav: document.getElementById('det-stav').value,
             nazev: document.getElementById('det-proj-name').value,
+            link: document.getElementById('det-proj-link').value,
             cena: parseInt(document.getElementById('det-price').value),
             zakaznik: document.getElementById('det-cust-name').value,
             email: document.getElementById('det-email').value,
@@ -492,6 +507,7 @@
             barva: document.getElementById('det-color').value,
             ico: document.getElementById('det-ico').value,
             dic: document.getElementById('det-dic').value,
+            fakturacniAdresa: document.getElementById('det-full-address').value,
             phone: document.getElementById('det-phone').value
         });
         closeModal();
