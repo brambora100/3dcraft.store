@@ -2,209 +2,82 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Výběr doručení | 3DCRAFT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <title>Výběr dopravy | 3DCRAFT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
+    
     <style>
-        :root {
-            --primary: #6366f1;
-            --bg: #0f172a;
-            --card-bg: #ffffff;
-            --text-dark: #0f172a;
-            --text-light: #64748b;
-            --danger: #ef4444;
-            --card-width: 400px;
-            --card-height: 480px;
+        :root { 
+            --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; 
+            --text: #0f172a; --text-muted: #64748b; 
         }
-
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
-            box-sizing: border-box;
+            background: var(--bg); color: var(--text); 
+            display: flex; align-items: center; justify-content: center; 
+            min-height: 100vh; margin: 0; padding: 20px;
         }
-
         .card { 
-            background: var(--card-bg); 
-            padding: 50px 40px; 
-            border-radius: 32px; 
-            text-align: center; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            width: var(--card-width); 
-            height: var(--card-height); 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Logo fixně nahoře */
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
+            background: var(--card); padding: 40px; border-radius: 24px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+            max-width: 450px; width: 100%; text-align: center; 
         }
-
-        /* Centrování obsahu pod logem pro stabilní layout */
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1; /* Zabere zbytek místa v kartě */
-            width: 100%;
-        }
-
-        .logo { 
-            font-size: 24px; 
-            font-weight: 900; 
-            letter-spacing: 2px; 
-            color: var(--text-dark); 
-            margin-bottom: 20px; /* Mezera pod logem */
-            flex-shrink: 0;
-        }
-        .logo span { color: var(--primary); }
-
-        .ui-section { 
-            display: none; 
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        h1 { font-weight: 800; margin-bottom: 10px; font-size: 1.5rem; }
+        p { color: var(--text-muted); line-height: 1.6; }
+        
         .btn { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 18px; 
-            border-radius: 16px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            width: 100%; 
-            transition: 0.3s; 
-            font-size: 15px; 
-            text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+            background: var(--primary); color: white; border: none; 
+            padding: 16px 32px; border-radius: 12px; font-weight: 700; 
+            cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s;
             margin-top: 20px;
         }
-
-        .btn:hover { background: #4f46e5; transform: translateY(-2px); }
-
-        .status-badge {
-            display: inline-block;
-            padding: 7px 16px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 800;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-waiting { background: #fef3c7; color: #92400e; }
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-error { background: #fee2e2; color: #b91c1c; }
-
-        h2 { font-size: 22px; margin: 0 0 12px; color: var(--text-dark); font-weight: 800; line-height: 1.3; }
-        p { color: var(--text-light); font-size: 14px; line-height: 1.6; margin: 0 0 24px; }
-
-        .pobocka-box {
-            background: #f8fafc;
-            border: 2px dashed #e2e8f0;
-            padding: 18px;
-            border-radius: 16px;
-            margin: 10px 0 25px 0;
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .loader { 
-            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); 
-            border-radius: 50%; width: 50px; height: 50px; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 20px;
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
+        
+        #loading-ui { display: flex; flex-direction: column; align-items: center; }
+        .spinner { 
+            width: 40px; height: 40px; border: 4px solid #f3f3f3; 
+            border-top: 4px solid var(--primary); border-radius: 50%; 
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .error-icon {
-            width: 60px;
-            height: 60px;
-            background-color: #fee2e2;
-            color: var(--danger);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        /* Responzivita pro malé displeje */
-        @media (max-width: 450px) {
-            :root {
-                --card-width: 100%;
-                --card-height: auto;
-            }
-            .card {
-                padding: 40px 25px;
-                min-height: 400px;
-            }
-        }
+        
+        .success-icon { font-size: 3rem; color: #10b981; margin-bottom: 20px; }
+        .error-icon { font-size: 3rem; color: #ef4444; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="logo">3D<span>CRAFT</span></div>
-
-        <div class="content-wrapper">
-            <div id="loading-ui" class="ui-section">
-                <div class="loader"></div>
-                <p style="font-weight: 700; color: var(--text-dark);">Načítám detaily objednávky...</p>
-            </div>
-
-            <div id="selection-ui" class="ui-section">
-                <div class="status-badge badge-waiting">Čeká na výběr</div>
-                <h2>Kam model pošleme?</h2>
-                <p>Vyberte si prosím výdejní místo Zásilkovny. Data se po výběru okamžitě propíšou do našeho systému.</p>
-                <button id="btn-pick" class="btn">📍 Vybrat výdejní místo</button>
-            </div>
-
-            <div id="done-ui" class="ui-section">
-                <div class="status-badge badge-success">Doprava uložena</div>
-                <h2>Máme hotovo!</h2>
-                <p>Váš model doručíme na adresu:</p>
-                <div id="display-pobocka" class="pobocka-box">---</div>
-                <p style="font-size: 12px; margin-bottom: 0;">Okno můžete zavřít. Brzy vás budeme kontaktovat ohledně platby.</p>
-            </div>
-
-            <div id="error-ui" class="ui-section">
-                <div class="status-badge badge-error">Nelze načíst</div>
-                <div class="error-icon">×</div>
-                <h2>Chyba přístupu</h2>
-                <p id="error-text">Tento odkaz není platný. Pravděpodobně chybí bezpečnostní token, nebo byla objednávka již vyřízena.</p>
-            </div>
-        </div>
+<div class="card">
+    <div id="loading-ui">
+        <div class="spinner"></div>
+        <p>Ověřujeme údaje objednávky...</p>
     </div>
+
+    <div id="selection-ui" style="display:none;">
+        <h1>Vyberte doručení</h1>
+        <p>Pro dokončení objednávky vyberte prosím výdejní místo Zásilkovny (Packeta), kam vám balíček zašleme.</p>
+        <button class="btn" id="btn-pick">VYBRAT VÝDEJNÍ MÍSTO</button>
+    </div>
+
+    <div id="done-ui" style="display:none;">
+        <div class="success-icon">✅</div>
+        <h1>Doprava uložena!</h1>
+        <p>Vybrali jste: <br><strong id="display-pobocka" style="color:var(--text)"></strong></p>
+        <p style="font-size: 0.9rem; margin-top: 20px;">Nyní můžete toto okno zavřít. O dalším postupu vás budeme informovat e-mailem.</p>
+    </div>
+
+    <div id="error-ui" style="display:none;">
+        <div class="error-icon">❌</div>
+        <h1>Něco se nepovedlo</h1>
+        <p id="error-text">Odkaz je neplatný nebo došlo k chybě při komunikaci s databází.</p>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"; // Přidáno Auth
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
@@ -215,7 +88,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app); // Inicializace Auth
+    const auth = getAuth(app);
+
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
     const WORKER_URL = "https://emailoveakce.bilcusadam.workers.dev/";
@@ -228,26 +102,28 @@
     };
 
     function showUI(section) {
-        Object.keys(ui).forEach(key => ui[key].style.display = (key === section ? 'flex' : 'none'));
+        Object.keys(ui).forEach(key => ui[key].style.display = (key === section ? 'block' : 'none'));
+        if(section === 'loading') ui.loading.style.display = 'flex';
     }
 
     async function init() {
         if (!orderId) {
+            document.getElementById('error-text').innerText = "Chybí ID objednávky v adrese.";
             showUI('error');
             return;
         }
 
-        showUI('loading');
-
         try {
-            // KLÍČOVÁ ZMĚNA: Nejdřív se anonymně přihlásíme, pak čteme data
+            // 1. ANONYMNÍ PŘIHLÁŠENÍ (Musí být v Firebase zapnuté!)
             await signInAnonymously(auth);
             
+            // 2. NAČTENÍ DAT
             const docRef = doc(db, "objednavky", orderId);
             const snap = await getDoc(docRef);
 
             if (snap.exists()) {
                 const data = snap.data();
+                // Pokud už je doprava vybraná, ukaž rekapitulaci
                 if (data.shipAddress && data.shipAddress.includes("Zásilkovna")) {
                     document.getElementById('display-pobocka').innerText = data.shipAddress;
                     showUI('done');
@@ -255,29 +131,32 @@
                     showUI('selection');
                 }
             } else {
-                document.getElementById('error-text').innerText = "Objednávka nebyla nalezena.";
+                document.getElementById('error-text').innerText = "Objednávka nebyla v systému nalezena.";
                 showUI('error');
             }
         } catch (e) {
             console.error("Firebase Error:", e);
-            document.getElementById('error-text').innerText = "Chyba oprávnění nebo připojení k DB.";
+            document.getElementById('error-text').innerText = "Technická chyba: " + (e.code || "Připojení selhalo");
             showUI('error');
         }
     }
 
     document.getElementById('btn-pick').onclick = () => {
+        // Widget Zásilkovny (API klíč c935...)
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
                 showUI('loading');
                 const fullAddress = `Zásilkovna: ${point.name}, ${point.street}, ${point.city}`;
                 
                 try {
+                    // Uložit do Firebase
                     await updateDoc(doc(db, "objednavky", orderId), {
                         shipAddress: fullAddress,
-                        pobocka_id: point.id
+                        pobocka_id: point.id,
+                        status_dopravy: "vybrano"
                     });
 
-                    // Sync s workerem
+                    // Informovat Worker (volitelné pro synchronizaci)
                     fetch(WORKER_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -286,19 +165,21 @@
                             orderId: orderId,
                             address: fullAddress
                         })
-                    }).catch(err => console.error("Worker sync failed", err));
+                    }).catch(e => console.log("Worker sync skipped"));
 
                     document.getElementById('display-pobocka').innerText = fullAddress;
                     showUI('done');
                 } catch (e) {
-                    alert("Chyba při ukládání. Zkuste to znovu.");
+                    alert("Chyba při ukládání: " + e.message);
                     showUI('selection');
                 }
             }
         }, { country: "cz", language: "cs" });
     };
 
+    // Spustit aplikaci
     init();
 </script>
+
 </body>
 </html>
