@@ -204,6 +204,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"; // Přidáno Auth
 
     const firebaseConfig = {
         apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY",
@@ -214,6 +215,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app); // Inicializace Auth
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
     const WORKER_URL = "https://emailoveakce.bilcusadam.workers.dev/";
@@ -238,6 +240,9 @@
         showUI('loading');
 
         try {
+            // KLÍČOVÁ ZMĚNA: Nejdřív se anonymně přihlásíme, pak čteme data
+            await signInAnonymously(auth);
+            
             const docRef = doc(db, "objednavky", orderId);
             const snap = await getDoc(docRef);
 
@@ -250,12 +255,12 @@
                     showUI('selection');
                 }
             } else {
-                document.getElementById('error-text').innerText = "Objednávka nebyla v databázi nalezena.";
+                document.getElementById('error-text').innerText = "Objednávka nebyla nalezena.";
                 showUI('error');
             }
         } catch (e) {
-            console.error(e);
-            document.getElementById('error-text').innerText = "Došlo k technické chybě při komunikaci s databází.";
+            console.error("Firebase Error:", e);
+            document.getElementById('error-text').innerText = "Chyba oprávnění nebo připojení k DB.";
             showUI('error');
         }
     }
@@ -272,8 +277,8 @@
                         pobocka_id: point.id
                     });
 
-                    // Synchronizace s workerem
-                    await fetch(WORKER_URL, {
+                    // Sync s workerem
+                    fetch(WORKER_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
@@ -281,13 +286,12 @@
                             orderId: orderId,
                             address: fullAddress
                         })
-                    });
+                    }).catch(err => console.error("Worker sync failed", err));
 
                     document.getElementById('display-pobocka').innerText = fullAddress;
                     showUI('done');
                 } catch (e) {
-                    console.error(e);
-                    alert("Chyba při ukládání pobočky. Zkuste to prosím znovu.");
+                    alert("Chyba při ukládání. Zkuste to znovu.");
                     showUI('selection');
                 }
             }
