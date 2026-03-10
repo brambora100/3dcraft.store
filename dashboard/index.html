@@ -224,6 +224,8 @@
                     <div><label>Barva</label><input type="text" id="det-color"></div>
                 </div>
                 <label>Cena Tisku (Bez dopravy!)</label><input type="number" id="det-price">
+                <label>Poznámka k tisku (vč. využití a ks)</label>
+                <textarea id="det-note" rows="3"></textarea>
             </div>
 
             <div>
@@ -275,6 +277,7 @@
     let activeId = null;
     signInAnonymously(auth);
 
+    // ARES PROXY
     const aresSearchInput = document.getElementById('ares-search-name');
     const aresResultsDiv = document.getElementById('ares-results');
 
@@ -372,6 +375,12 @@
         const name = document.getElementById('proj-name').value;
         const tiskCena = parseInt(document.getElementById('final-price-display').innerText);
         const fullAddr = `${document.getElementById('cust-address').value}, ${document.getElementById('cust-city').value} ${document.getElementById('cust-psc').value}`;
+        
+        // AUTOMATICKÉ DOPLNĚNÍ POZNÁMKY O VYUŽITÍ A MNOŽSTVÍ
+        const vyuziti = document.getElementById('proj-env').value;
+        const mnozstvi = document.getElementById('pcs-input').value;
+        const puvodniPoznamka = document.getElementById('proj-note').value;
+        const finalniPoznamka = `VYUŽITÍ: ${vyuziti}\nMNOŽSTVÍ: ${mnozstvi} ks\n----------\n${puvodniPoznamka}`;
 
         if(!name) return alert("Zadejte název!");
         try {
@@ -389,6 +398,7 @@
                 ico: document.getElementById('cust-ico').value,
                 dic: document.getElementById('cust-dic').value,
                 fakturacniAdresa: fullAddr,
+                poznamka: finalniPoznamka,
                 datum: serverTimestamp()
             });
             switchTab('orders');
@@ -434,6 +444,7 @@
         document.getElementById('det-dic').value = o.dic || "";
         document.getElementById('det-full-address').value = o.fakturacniAdresa || "";
         document.getElementById('det-phone').value = o.phone || "";
+        document.getElementById('det-note').value = o.poznamka || "";
         document.getElementById('det-ship-address').innerText = o.shipAddress || "Doprava zatím nevybrána";
         document.getElementById('detail-modal').classList.remove('hidden');
     };
@@ -508,6 +519,7 @@
             ico: document.getElementById('det-ico').value,
             dic: document.getElementById('det-dic').value,
             fakturacniAdresa: document.getElementById('det-full-address').value,
+            poznamka: document.getElementById('det-note').value,
             phone: document.getElementById('det-phone').value
         });
         closeModal();
