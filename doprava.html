@@ -8,67 +8,83 @@
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     <style>
         :root { --primary: #6366f1; --bg: #f8fafc; --text: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
-        .checkout-card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .checkout-card { background: white; padding: 35px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
         .step { display: none; }
         .step.active { display: block; }
-        h2 { margin-top: 0; font-weight: 800; letter-spacing: -1px; }
-        .option { border: 2px solid #e2e8f0; padding: 15px; border-radius: 15px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .option:hover { border-color: var(--primary); background: #f5f7ff; }
+        h2 { margin-top: 0; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .option { border: 2px solid #e2e8f0; padding: 15px; border-radius: 15px; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; }
         .option.selected { border-color: var(--primary); background: #eef2ff; }
-        .price-summary { background: #f1f5f9; padding: 20px; border-radius: 18px; margin: 20px 0; }
-        .total-price { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 1rem; margin-top: 10px; }
-        .qr-area { text-align: center; background: #fff; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; }
-        .bank-info { font-family: monospace; background: #f8fafc; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 1.1rem; }
-        .loader { text-align: center; padding: 40px; }
+        .summary-box { background: #f1f5f9; padding: 20px; border-radius: 18px; margin: 20px 0; border: 1px dashed #cbd5e1; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        .back-btn { background: none; color: #64748b; text-decoration: underline; margin-top: 10px; padding: 5px; cursor: pointer; border: none; font-weight: 600; }
+        .company-fields { display: none; }
     </style>
 </head>
 <body>
 
 <div class="checkout-card">
-    <div id="loader" class="loader">Načítám detaily objednávky...</div>
-
-    <div id="step-shipping" class="step">
-        <h2>Kam to pošleme?</h2>
-        <p>Vyberte způsob dopravy pro projekt: <strong id="order-name-display">...</strong></p>
+    <div id="step-1" class="step active">
+        <h2>👤 Vaše údaje</h2>
+        <div class="grid">
+            <input type="text" id="cust-name" placeholder="Jméno">
+            <input type="text" id="cust-surname" placeholder="Příjmení">
+        </div>
+        <input type="email" id="cust-email" placeholder="E-mail">
+        <input type="tel" id="cust-phone" placeholder="Telefon">
         
-        <div class="option" onclick="selectShip(79, 'Zásilkovna - Pobočka')">
-            <span>📦 Zásilkovna - Výdejní místo</span>
-            <strong>79 Kč</strong>
-        </div>
-        <div class="option" onclick="selectShip(119, 'Zásilkovna - Na adresu')">
-            <span>🏠 Doručení na adresu</span>
-            <strong>119 Kč</strong>
+        <label style="display:flex; align-items:center; gap:8px; margin-bottom:15px; font-weight:600;">
+            <input type="checkbox" id="is-company" onchange="toggleCompany()" style="width:auto; margin:0;"> Nakupuji na firmu
+        </label>
+
+        <div id="company-area" class="company-fields">
+            <input type="text" id="comp-name" placeholder="Název firmy">
+            <input type="text" id="comp-ico" placeholder="IČO">
         </div>
 
-        <div class="price-summary">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px; opacity:0.7;">
-                <span>Cena za tisk:</span>
-                <span id="print-price">0 Kč</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-weight:700;">
-                <span>Celkem k úhradě:</span>
-                <span class="total-price" id="total-price-display">0 Kč</span>
-            </div>
+        <h3>Fakturační adresa</h3>
+        <input type="text" id="addr-street" placeholder="Ulice a č.p.">
+        <div class="grid">
+            <input type="text" id="addr-city" placeholder="Město">
+            <input type="text" id="addr-zip" placeholder="PSČ">
         </div>
-
-        <div id="selected-branch" style="margin-bottom:15px; font-weight:600; color:var(--primary); display:none;"></div>
-        <button id="btn-confirm" onclick="confirmOrder()" disabled>Potvrdit a zaplatit</button>
+        <button onclick="toStep(2)">Pokračovat k dopravě</button>
     </div>
 
-    <div id="step-payment" class="step">
-        <h2 style="text-align:center;">Poslední krok: Platba</h2>
-        <div class="qr-area">
-            <div id="qr-container"></div>
-            <div class="total-price" id="final-amount">0 Kč</div>
-            <p style="margin-bottom:5px; font-size:0.9rem; color:#64748b;">Číslo účtu (Air Bank):</p>
-            <div class="bank-info">2502263445 / 2010</div>
-            <p style="font-size:0.8rem; margin-top:10px;">Variabilní symbol: <strong id="vs-display"></strong></p>
+    <div id="step-2" class="step">
+        <h2>🚚 Způsob dopravy</h2>
+        <div class="option" onclick="selectShip(79, 'Zásilkovna - Výdejní místo', true)">
+            <span>📦 Zásilkovna / Balíkovna</span>
+            <strong>79 Kč</strong>
         </div>
-        <p style="font-size: 0.85rem; color: #64748b; text-align: center; margin-top: 20px;">
-            Jakmile obdržíme platbu, tiskárna se automaticky rozjede. Fakturu obdržíte do e-mailu.
-        </p>
+        <div id="branch-info" style="margin-bottom:10px; color:var(--primary); font-weight:700;"></div>
+        
+        <div class="option" onclick="selectShip(129, 'Doručení na adresu', false)">
+            <span>🏠 Doručení na adresu</span>
+            <strong>129 Kč</strong>
+        </div>
+        <button onclick="toStep(3)" id="btn-to-3" disabled>Rekapitulace objednávky</button>
+        <center><button class="back-btn" onclick="toStep(1)">Zpět k údajům</button></center>
+    </div>
+
+    <div id="step-3" class="step">
+        <h2>✅ Rekapitulace</h2>
+        <div class="summary-box" id="final-summary">
+            </div>
+        <p style="font-size:0.8rem; color:#64748b;">Kliknutím na tlačítko níže potvrdíte objednávku a bude Vám zaslána faktura.</p>
+        <button onclick="finishOrder()">POTVRDIT A ZAPLATIT</button>
+        <center><button class="back-btn" onclick="toStep(2)">Změnit dopravu/údaje</button></center>
+    </div>
+
+    <div id="step-4" class="step" style="text-align:center;">
+        <h2>💳 Platba</h2>
+        <div id="qr-container"></div>
+        <div style="font-size:1.5rem; font-weight:800; color:var(--primary); margin:15px 0;" id="final-total"></div>
+        <p>Číslo účtu: <strong>2502263445 / 2010</strong></p>
+        <p>Variabilní symbol: <strong id="vs-display"></strong></p>
+        <p id="invoice-link-area"></p>
     </div>
 </div>
 
@@ -76,13 +92,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBrbJDCJkFm7lD2XOH7-TZmyFRqAUFdQkY", 
-        authDomain: "dcraft-748f9.firebaseapp.com", 
-        projectId: "dcraft-748f9", 
-        appId: "1:761752992060:web:b84c4687cc3dff6afb8639" 
-    };
-
+    const firebaseConfig = { /* TVOJE KONFIGURACE */ };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -90,92 +100,100 @@
     const orderId = urlParams.get('id');
 
     let orderData = null;
-    let selectedShippingCost = 0;
-    let selectedShippingName = "";
-    let selectedBranchInfo = "";
+    let shipPrice = 0;
+    let shipName = "";
+    let branchDetail = "";
 
-    // 1. Načtení dat z Firebase
     async function init() {
-        if (!orderId) {
-            document.body.innerHTML = "<h2>Chyba: Neplatný odkaz</h2>";
-            return;
-        }
-
         const docRef = doc(db, "objednavky", orderId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            orderData = docSnap.data();
-            document.getElementById('loader').classList.add('hidden');
-            document.getElementById('step-shipping').classList.add('active');
-            
-            document.getElementById('order-name-display').innerText = orderData.nazev;
-            document.getElementById('print-price').innerText = orderData.cena + " Kč";
-            updateTotal();
-        } else {
-            document.body.innerHTML = "<h2>Zakázka nenalezena</h2>";
+        const snap = await getDoc(docRef);
+        if(snap.exists()) {
+            orderData = snap.data();
+            // Předvyplnit e-mail pokud ho už máme z adminu
+            document.getElementById('cust-email').value = orderData.email || "";
         }
     }
 
-    // 2. Výběr dopravy
-    window.selectShip = (cost, name) => {
-        selectedShippingCost = cost;
-        selectedShippingName = name;
-        
-        // Vizuální označení
-        document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
+    window.toggleCompany = () => {
+        document.getElementById('company-area').style.display = document.getElementById('is-company').checked ? 'block' : 'none';
+    };
 
-        if (name.includes("Pobočka")) {
-            Packeta.Widget.pick("c93547849e77864c", (point) => {
-                if (point) {
-                    selectedBranchInfo = `Zásilkovna: ${point.name}, ${point.street}`;
-                    document.getElementById('selected-branch').innerText = "📍 Vybráno: " + selectedBranchInfo;
-                    document.getElementById('selected-branch').style.display = "block";
-                    document.getElementById('btn-confirm').disabled = false;
-                    updateTotal();
+    window.toStep = (n) => {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step-' + n).classList.add('active');
+        if(n === 3) renderSummary();
+    };
+
+    window.selectShip = (price, name, isPacketa) => {
+        shipPrice = price;
+        shipName = name;
+        if(isPacketa) {
+            Packeta.Widget.pick("c93547849e77864c", (p) => {
+                if(p) {
+                    branchDetail = p.name + ", " + p.street;
+                    document.getElementById('branch-info').innerText = "Vybráno: " + branchDetail;
+                    document.getElementById('btn-to-3').disabled = false;
                 }
-            }, { country: "cz" });
+            });
         } else {
-            selectedBranchInfo = "Doručení na adresu (bude upřesněno)";
-            document.getElementById('selected-branch').style.display = "none";
-            document.getElementById('btn-confirm').disabled = false;
-            updateTotal();
+            branchDetail = "Doručení na adresu";
+            document.getElementById('btn-to-3').disabled = false;
         }
     };
 
-    function updateTotal() {
-        const total = (orderData.cena || 0) + selectedShippingCost;
-        document.getElementById('total-price-display').innerText = total + " Kč";
+    function renderSummary() {
+        const total = orderData.cena + shipPrice;
+        let html = `
+            <strong>Projekt:</strong> ${orderData.nazev}<br>
+            <strong>Zákazník:</strong> ${document.getElementById('cust-name').value} ${document.getElementById('cust-surname').value}<br>
+            <strong>Doprava:</strong> ${shipName}<br>
+            <hr>
+            <strong>Cena tisk:</strong> ${orderData.cena} Kč<br>
+            <strong>Doprava:</strong> ${shipPrice} Kč<br>
+            <strong style="color:var(--primary); font-size:1.2rem;">Celkem: ${total} Kč</strong>
+        `;
+        document.getElementById('final-summary').innerHTML = html;
     }
 
-    // 3. Potvrzení a zobrazení QR kódu
-    window.confirmOrder = async () => {
-        const total = orderData.cena + selectedShippingCost;
+    window.finishOrder = async () => {
+        const total = orderData.cena + shipPrice;
+        const vs = orderId.replace(/\D/g,'').substring(0,10);
         
-        // Aktualizace Firebase
-        await updateDoc(doc(db, "objednavky", orderId), {
-            shipAddress: selectedBranchInfo,
+        const updates = {
+            stav: "čeka na platbu",
             cena_celkem: total,
-            cena_doprava: selectedShippingCost,
-            stav: "čeka na platbu"
+            zakaznik_full: document.getElementById('cust-name').value + " " + document.getElementById('cust-surname').value,
+            adresa_fakturace: `${document.getElementById('addr-street').value}, ${document.getElementById('addr-city').value}`,
+            ico: document.getElementById('comp-ico').value || "",
+            doprava_info: branchDetail
+        };
+
+        await updateDoc(doc(db, "objednavky", orderId), updates);
+
+        // Odeslání e-mailu s fakturou přes Worker
+        fetch("https://emailoveakce.bilcusadam.workers.dev/", {
+            method: "POST",
+            body: JSON.stringify({
+                action: "send_specific_mail",
+                mailType: "faktura_k_platbe",
+                email: document.getElementById('cust-email').value,
+                invoiceUrl: orderData.invoiceUrl, // URL nahrané v adminu
+                total: total
+            })
         });
 
-        // Přepnutí na platbu
-        document.getElementById('step-shipping').classList.remove('active');
-        document.getElementById('step-payment').classList.add('active');
-        document.getElementById('final-amount').innerText = total + " Kč";
-        
-        const vs = orderId.replace(/\D/g,'').substring(0,10) || "12345";
+        // Zobrazení platby
+        toStep(4);
+        document.getElementById('final-total').innerText = total + " Kč";
         document.getElementById('vs-display').innerText = vs;
-
-        // Generování QR (Standard SPAY)
-        const qrUrl = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=2502263445&bankCode=2010&amount=${total}&currency=CZK&vs=${vs}&message=3DCRAFT_${orderId.substring(0,5)}`;
-        document.getElementById('qr-container').innerHTML = `<img src="${qrUrl}" style="width:200px; height:200px;" />`;
+        const qrUrl = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=2502263445&bankCode=2010&amount=${total}&currency=CZK&vs=${vs}`;
+        document.getElementById('qr-container').innerHTML = `<img src="${qrUrl}" width="250">`;
+        if(orderData.invoiceUrl) {
+            document.getElementById('invoice-link-area').innerHTML = `<a href="${orderData.invoiceUrl}" target="_blank">📄 Stáhnout fakturu (PDF)</a>`;
+        }
     };
 
     init();
 </script>
-
 </body>
 </html>
