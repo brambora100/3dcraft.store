@@ -8,18 +8,14 @@
     <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
     
     <style>
-        :root { 
-            --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; 
-            --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
-        }
+        :root { --primary: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --border: #e2e8f0; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
         .card { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
         h1 { font-weight: 800; margin-bottom: 10px; font-size: 1.5rem; text-align: center; }
-        p { color: var(--text-muted); line-height: 1.6; text-align: center; margin-bottom: 25px; }
+        p { color: #64748b; line-height: 1.6; text-align: center; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; color: #475569; }
         input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; }
-        input:focus { outline: none; border-color: var(--primary); ring: 2px var(--primary); }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .company-fields { display: none; background: #f1f5f9; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #e2e8f0; }
         .btn { background: var(--primary); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; transition: 0.2s; margin-top: 20px; }
@@ -28,27 +24,30 @@
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .rekap-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        .legal-notice { font-size: 0.75rem; color: #94a3b8; margin-top: 15px; text-align: justify; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div id="loading-ui"><div class="spinner"></div><p>Zpracovávám...</p></div>
+    <div id="loading-ui"><div class="spinner"></div><p>Ukládám data do systému...</p></div>
 
     <div id="details-ui">
-        <h1>Fakturační údaje</h1>
-        <p>Zadejte prosím údaje, které budou uvedeny na faktuře.</p>
+        <h1>Kontaktní a fakturační údaje</h1>
+        <p>Tyto údaje budou použity pro doručení a fakturaci.</p>
         
         <div class="row">
             <div class="form-group"><label>Jméno</label><input type="text" id="f-name" placeholder="Jan"></div>
             <div class="form-group"><label>Příjmení</label><input type="text" id="f-surname" placeholder="Novák"></div>
         </div>
+        
+        <div class="form-group"><label>Telefon (pro dopravce)</label><input type="tel" id="f-phone" placeholder="+420 777 123 456"></div>
         <div class="form-group"><label>Ulice a č.p.</label><input type="text" id="f-street" placeholder="Vodičkova 123/1"></div>
+        
         <div class="row">
             <div class="form-group"><label>Město</label><input type="text" id="f-city" placeholder="Praha"></div>
             <div class="form-group"><label>PSČ</label><input type="text" id="f-zip" placeholder="110 00"></div>
         </div>
+
         <div class="form-group">
             <label>Typ nákupu</label>
             <select id="f-is-company" onchange="toggleCompany()">
@@ -56,28 +55,21 @@
                 <option value="yes">Firma / Živnostník</option>
             </select>
         </div>
+
         <div id="company-box" class="company-fields">
             <div class="form-group"><label>IČO</label><input type="text" id="f-ico" placeholder="Zadejte IČO" onblur="fetchAres()"></div>
-            <div class="form-group"><label>Název firmy</label><input type="text" id="f-company-name" readonly style="background:#e2e8f0; color:#64748b;"></div>
+            <div class="form-group"><label>Název firmy</label><input type="text" id="f-company-name" readonly style="background:#e2e8f0;"></div>
             <div class="form-group"><label>DIČ (nepovinné)</label><input type="text" id="f-dic" placeholder="CZ12345678"></div>
         </div>
 
-        <p class="legal-notice">Pokračováním souhlasíte, že se jedná o zakázkovou výrobu. Po odeslání budou data uložena jako závazná pro fakturaci.</p>
-        <button class="btn" id="btn-next">VYBRAT DOPRAVU A ODESLAT</button>
+        <button class="btn" id="btn-next">VYBRAT DOPRAVU A POTVRDIT</button>
     </div>
 
     <div id="done-ui" style="display:none; text-align: center;">
         <div style="font-size: 3rem; color: #10b981; margin-bottom: 15px;">✅</div>
-        <h1>Údaje uloženy</h1>
-        <p>Děkujeme! Vaše fakturační adresa i doprava byly úspěšně spárovány s objednávkou.</p>
-        <div id="rekapitulace" style="text-align: left; background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;"></div>
-        <p style="font-size: 0.8rem;">Nyní můžete toto okno zavřít.</p>
-    </div>
-
-    <div id="error-ui" style="display:none; text-align: center;">
-        <div style="font-size:3rem; margin-bottom:15px;">❌</div>
-        <h1>Chyba</h1>
-        <p id="error-text">Odkaz je neplatný nebo vypršel.</p>
+        <h1>Hotovo!</h1>
+        <p>Vaše údaje byly v pořádku spárovány s objednávkou.</p>
+        <div id="rekapitulace" style="text-align: left; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>
     </div>
 </div>
 
@@ -99,12 +91,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
 
-    const show = (id) => {
-        ['loading-ui', 'details-ui', 'done-ui', 'error-ui'].forEach(el => 
-            document.getElementById(el).style.display = (el === id ? (id==='loading-ui'?'flex':'block') : 'none')
-        );
-    };
-
     window.toggleCompany = () => {
         document.getElementById('company-box').style.display = document.getElementById('f-is-company').value === 'yes' ? 'block' : 'none';
     };
@@ -122,59 +108,56 @@
     };
 
     async function init() {
-        if (!orderId) { show('error-ui'); return; }
+        if (!orderId) return;
         try {
             await signInAnonymously(auth);
             const snap = await getDoc(doc(db, "objednavky", orderId));
             if (snap.exists() && snap.data().status_kompletni) {
                 renderRekap(snap.data());
-                show('done-ui');
+                document.getElementById('details-ui').style.display = 'none';
+                document.getElementById('done-ui').style.display = 'block';
             }
-        } catch (e) { show('error-ui'); }
+        } catch (e) {}
     }
 
     function renderRekap(data) {
         document.getElementById('rekapitulace').innerHTML = `
-            <div class="rekap-row"><span>Adresát:</span> <strong>${data.zakaznik_jmeno}</strong></div>
-            <div class="rekap-row"><span>Ulice:</span> <strong>${data.zakaznik_ulice}</strong></div>
-            <div class="rekap-row"><span>Město:</span> <strong>${data.zakaznik_mesto}</strong></div>
-            ${data.firma_nazev ? `<div class="rekap-row"><span>Firma:</span> <strong>${data.firma_nazev}</strong></div>` : ''}
+            <div class="rekap-row"><span>Jméno:</span> <strong>${data.zakaznik_jmeno}</strong></div>
+            <div class="rekap-row"><span>Tel:</span> <strong>${data.zakaznik_tel}</strong></div>
+            <div class="rekap-row"><span>Adresa:</span> <strong>${data.zakaznik_ulice}, ${data.zakaznik_mesto}</strong></div>
             <div class="rekap-row"><span>Doprava:</span> <strong style="color:var(--primary)">${data.shipAddress}</strong></div>
         `;
     }
 
     document.getElementById('btn-next').onclick = () => {
-        const name = document.getElementById('f-name').value.trim();
-        const surname = document.getElementById('f-surname').value.trim();
-        const street = document.getElementById('f-street').value.trim();
-        const city = document.getElementById('f-city').value.trim();
-        const zip = document.getElementById('f-zip').value.trim();
+        const fields = {
+            name: document.getElementById('f-name').value,
+            surname: document.getElementById('f-surname').value,
+            phone: document.getElementById('f-phone').value,
+            street: document.getElementById('f-street').value,
+            city: document.getElementById('f-city').value,
+            zip: document.getElementById('f-zip').value
+        };
 
-        if (!name || !surname || !street || !city || !zip) {
-            alert("Prosím vyplňte všechna pole fakturační adresy."); return;
+        if (!fields.name || !fields.surname || !fields.phone || !fields.street || !fields.city) {
+            alert("Prosím vyplňte všechna pole včetně telefonu."); return;
         }
 
-        const isCompany = document.getElementById('f-is-company').value === 'yes';
-        const companyName = document.getElementById('f-company-name').value;
-        const ico = document.getElementById('f-ico').value;
-
-        if (isCompany && (!companyName || !ico)) {
-            alert("Pro nákup na firmu vyplňte IČO."); return;
-        }
-
-        // Spustit Zásilkovnu
         Packeta.Widget.pick("c93547849e77864c", async (point) => {
             if (point) {
-                show('loading-ui');
+                document.getElementById('details-ui').style.display = 'none';
+                document.getElementById('loading-ui').style.display = 'flex';
+                
                 try {
                     const finalData = {
-                        zakaznik_jmeno: `${name} ${surname}`,
-                        zakaznik_ulice: street,
-                        zakaznik_mesto: city,
-                        zakaznik_psc: zip,
-                        firma_nazev: isCompany ? companyName : "",
-                        firma_ico: isCompany ? ico : "",
-                        firma_dic: isCompany ? document.getElementById('f-dic').value : "",
+                        zakaznik_jmeno: `${fields.name} ${fields.surname}`,
+                        zakaznik_tel: fields.phone,
+                        zakaznik_ulice: fields.street,
+                        zakaznik_mesto: fields.city,
+                        zakaznik_psc: fields.zip,
+                        firma_nazev: document.getElementById('f-company-name').value || "",
+                        firma_ico: document.getElementById('f-ico').value || "",
+                        firma_dic: document.getElementById('f-dic').value || "",
                         shipAddress: `Zásilkovna: ${point.name}, ${point.street}, ${point.city}`,
                         pobocka_id: point.id,
                         status_kompletni: true,
@@ -183,10 +166,12 @@
 
                     await updateDoc(doc(db, "objednavky", orderId), finalData);
                     renderRekap(finalData);
-                    show('done-ui');
+                    document.getElementById('loading-ui').style.display = 'none';
+                    document.getElementById('done-ui').style.display = 'block';
                 } catch (e) {
                     alert("Chyba při ukládání: " + e.message);
-                    show('details-ui');
+                    document.getElementById('loading-ui').style.display = 'none';
+                    document.getElementById('details-ui').style.display = 'block';
                 }
             }
         }, { country: "cz", language: "cs" });
