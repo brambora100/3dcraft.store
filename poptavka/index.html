@@ -79,7 +79,7 @@
         /* --- HERO --- */
         .hero { 
             height: 40vh; position: relative; display: flex; align-items: center; justify-content: center;
-            background-image: url('https://cdr.cz/sites/default/files/adobestock_164378664.jpeg');
+            background-image: url('https://i.imgur.com/mUc4e2r.jpeg');
             background-size: cover; background-position: center;
         }
         .hero-overlay {
@@ -127,7 +127,7 @@
         .upload-area.error { border-color: var(--danger); background: #fef2f2; }
         .file-name { display: block; margin-top: 8px; font-size: 0.8rem; font-weight: 700; color: var(--primary); }
 
-        /* Checkbox fix */
+        /* Consent */
         .consent-group { display: flex; align-items: center; gap: 12px; margin-top: 20px; cursor: pointer; }
         .consent-group input { width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
         .consent-text { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; line-height: 1.4; }
@@ -166,6 +166,8 @@
             .contact-grid { grid-template-columns: 1fr; border-radius: 30px; }
             .triple-grid { grid-template-columns: 1fr 1fr; }
             .btn-poptavka { margin: 10px 0 0 0; width: 100%; text-align: center; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+            .footer-links { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -252,19 +254,19 @@
                         <div class="model-box" id="model-section">
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; display: block;">Podklady (Odkaz nebo Soubor) *</label>
                             <div class="form-group">
-                                <input type="text" id="p-link" class="form-control" placeholder="Odkaz na model (Printables, atd.)">
+                                <input type="text" id="p-link" class="form-control" placeholder="Odkaz na model (Printables, Thingiverse atd.)" oninput="handleSourceInput('link')">
                             </div>
                             <div style="text-align: center; margin: 10px 0; font-size: 0.7rem; font-weight: 800; color: #cbd5e1;">NEBO</div>
                             <div class="upload-area" id="upload-box" onclick="document.getElementById('p-file').click()">
-                                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-muted);">📁 Nahrát soubor (.stl, .step, .obj)</span>
-                                <input type="file" id="p-file" style="display:none" accept=".stl,.step,.stp,.obj" onchange="updateFileName(this)">
+                                <span id="upload-label" style="font-weight: 700; font-size: 0.9rem; color: var(--text-muted);">📁 Nahrát soubor (.stl, .step, .obj)</span>
+                                <input type="file" id="p-file" style="display:none" accept=".stl,.step,.stp,.obj" onchange="handleSourceInput('file')">
                                 <span id="file-display" class="file-name"></span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>Poznámka k objednávce *</label>
-                            <textarea id="p-message" class="form-control" placeholder="Popište nám svůj projekt..." required></textarea>
+                            <textarea id="p-message" class="form-control" style="height:100px;" placeholder="Popište nám svůj projekt..." required></textarea>
                         </div>
 
                         <label class="consent-group">
@@ -303,38 +305,38 @@
         const navGroup = document.getElementById('nav-group');
         mobileMenu.addEventListener('click', () => { navGroup.classList.toggle('active'); });
 
-        // Kontrola souboru
-        function updateFileName(input) {
+        // Inteligentní přepínání mezi souborem a odkazem
+        function handleSourceInput(type) {
+            const fileInput = document.getElementById('p-file');
+            const linkInput = document.getElementById('p-link');
             const display = document.getElementById('file-display');
-            const allowed = /(\.stl|\.step|\.stp|\.obj)$/i;
-            if (input.files.length > 0) {
-                if (!allowed.exec(input.files[0].name)) {
-                    alert('Chyba: Pouze soubory .stl, .step nebo .obj');
-                    input.value = '';
-                    display.innerText = '';
-                    return;
-                }
-                display.innerText = "Vybráno: " + input.files[0].name;
+            const uploadLabel = document.getElementById('upload-label');
+
+            if (type === 'file' && fileInput.files.length > 0) {
+                linkInput.value = ""; // Vymazat odkaz
+                display.innerText = "Vybráno: " + fileInput.files[0].name;
                 document.getElementById('model-section').style.borderColor = '#eef2f6';
+            } else if (type === 'link' && linkInput.value.trim() !== "") {
+                fileInput.value = ""; // Vymazat soubor
+                display.innerText = "";
             }
         }
 
         // Odesílání na Worker
-        const form = document.getElementById('poptavkaForm');
-        form.addEventListener('submit', async function(e) {
+        document.getElementById('poptavkaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const link = document.getElementById('p-link').value.trim();
             const file = document.getElementById('p-file');
             
             if (!link && file.files.length === 0) {
-                alert('Prosím vložte odkaz nebo nahrajte 3D model.');
+                alert('Prosím vložte buď odkaz, nebo nahrajte 3D model.');
                 document.getElementById('model-section').style.borderColor = 'var(--danger)';
                 return;
             }
 
             const btn = document.getElementById('submitBtn');
-            btn.innerText = '⌛ Odesílám do systému...';
+            btn.innerText = '⌛ Odesílám...';
             btn.disabled = true;
 
             const formData = new FormData();
@@ -356,8 +358,8 @@
                 });
 
                 if (response.ok) {
-                    alert('✅ Poptávka byla úspěšně odeslána a uložena.');
-                    form.reset();
+                    alert('✅ Poptávka byla úspěšně odeslána!');
+                    this.reset();
                     document.getElementById('file-display').innerText = '';
                 } else {
                     alert('❌ Chyba při odesílání.');
