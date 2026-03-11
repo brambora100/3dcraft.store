@@ -2,74 +2,75 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Dokončení objednávky | 3DCRAFT</title>
+    <title>Doprava a platba | 3DCRAFT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --bg: #f8fafc; --border: #e2e8f0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 500px; border: 1px solid var(--border); }
+        :root { --primary: #6366f1; --bg: #f8fafc; --text: #0f172a; --border: #e2e8f0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding: 10px; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { background: white; padding: 40px; border-radius: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); width: 100%; max-width: 550px; border: 1px solid var(--border); box-sizing: border-box; position: relative; z-index: 1; }
         .step { display: none; }
-        .step.active { display: block; }
-        h2 { margin-top: 0; color: #0f172a; font-weight: 800; }
-        input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-family: inherit; }
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; font-family: inherit; }
-        button:hover { opacity: 0.9; }
-        .ship-btn { background: #f1f5f9; color: #475569; margin-bottom: 10px; border: 1px solid var(--border); }
-        .ship-btn:hover { background: #e2e8f0; }
+        .step.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { margin-top: 0; font-weight: 800; font-size: 1.8rem; text-align: center; }
+        .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 0.9rem; }
+        input { width: 100%; padding: 14px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 12px; box-sizing: border-box; font-family: inherit; font-size: 1rem; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; font-family: inherit; font-size: 1rem; }
+        .ship-btn { background: #fff; color: #475569; margin-bottom: 12px; border: 2px solid var(--border); text-align: left; padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 16px; transition: 0.2s; }
+        .ship-btn:hover { border-color: var(--primary); background: #f5f7ff; }
+        #ship-info { margin: 20px 0; padding: 15px; border-radius: 14px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 600; text-align: center; display: none; }
         .hidden { display: none; }
-        .qr-box { text-align: center; margin-top: 20px; padding: 20px; border: 2px dashed var(--border); border-radius: 20px; background: #fafafa; }
-        #ship-info { margin: 15px 0; font-weight: 700; color: var(--primary); text-align: center; }
+        #balikovna-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 9999; }
+        #balikovna-iframe { width:100%; height:100%; border:none; }
+        .close-x { position: absolute; top: 15px; right: 20px; font-size: 35px; color: #0f172a; cursor: pointer; z-index: 10001; line-height: 1; font-weight: 300; transition: 0.2s; }
+        .close-x:hover { color: #ef4444; transform: scale(1.1); }
+        .highlight { color: var(--primary); font-weight: 800; font-size: 1.3rem; display: block; margin: 20px 0; }
     </style>
 </head>
 <body>
 
+<div id="balikovna-modal">
+    <div class="close-x" onclick="closeBalikovna()">&times;</div>
+    <iframe id="balikovna-iframe" allow="geolocation" src="https://b2c.cpost.cz/locations/?type=BALIKOVNY&phone=false"></iframe>
+</div>
+
 <div class="card">
     <div id="step-1" class="step active">
         <h2>👤 Vaše údaje</h2>
+        <p class="subtitle">Fakturační adresa pro ČR</p>
         <input type="text" id="c-jmeno" placeholder="Jméno a příjmení">
         <input type="text" id="c-ulice" placeholder="Ulice a č.p.">
-        <input type="text" id="c-mesto" placeholder="Město">
-        <input type="text" id="c-psc" placeholder="PSČ">
-        
-        <div style="margin: 10px 0;">
-            <label style="font-size: 0.9rem; cursor: pointer;">
-                <input type="checkbox" id="c-is-comp" style="width: auto; margin-right: 8px;"> Nakupuji na firmu
-            </label>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:15px;">
+            <input type="text" id="c-mesto" placeholder="Město">
+            <input type="text" id="c-psc" placeholder="PSČ">
         </div>
-        
-        <div id="comp-area" class="hidden">
-            <input type="text" id="c-firma" placeholder="Název firmy">
-            <input type="text" id="c-ico" placeholder="IČO">
-        </div>
-        
-        <button onclick="goToStep2()">Pokračovat k dopravě</button>
+        <button onclick="goToStep2()">Pokračovat</button>
     </div>
 
     <div id="step-2" class="step">
         <h2>🚚 Doprava</h2>
-        <p style="font-size: 0.9rem; color: #64748b;">Vyberte způsob doručení:</p>
-        <button class="ship-btn" onclick="pickPacketa()">📦 Vybrat Zásilkovnu (79 Kč)</button>
-        <button class="ship-btn" onclick="setShip(129, 'Doručení na adresu')">🏠 Na adresu (129 Kč)</button>
-        
-        <div id="ship-info">Zatím nevybráno</div>
-        
-        <button id="confirm-btn" class="hidden" onclick="finishOrder()">Potvrdit a přejít k platbě</button>
-        <button onclick="showStep(1)" style="background:none; color:#94a3b8; font-size:0.8rem; margin-top:10px;">← Zpět k údajům</button>
+        <p class="subtitle">Vyberte si pobočku nebo adresu</p>
+        <div class="ship-btn" onclick="openBalikovna()">
+            <span><strong>📦 Balíkovna</strong><br><small>Vybrat výdejní místo na mapě</small></span>
+            <strong>75 Kč</strong>
+        </div>
+        <div class="ship-btn" onclick="setShip(105, 'Doručení na adresu (ČR)')">
+            <span><strong>🏠 Na adresu</strong><br><small>Kurýr domů</small></span>
+            <strong>105 Kč</strong>
+        </div>
+        <div id="ship-info"></div>
+        <button id="confirm-btn" class="hidden" onclick="finishOrder()">DOKONČIT OBJEDNÁVKU</button>
+        <button onclick="showStep(1)" style="background:none; color:#94a3b8; font-size:0.8rem; margin-top:15px; font-weight: 600;">← ZPĚT</button>
     </div>
 
     <div id="step-3" class="step">
-        <h2 style="text-align:center;">💳 Platba</h2>
-        <div class="qr-box">
-            <div id="qr-code"></div>
-            <h3 id="final-price" style="font-size: 1.8rem; margin: 10px 0;">0 Kč</h3>
-            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 5px;">Účet: <strong>2502263445 / 2010</strong></p>
-            <p style="font-size: 0.9rem; color: #64748b;">Variabilní symbol: <strong id="final-vs">---</strong></p>
+        <div style="text-align: center;">
+            <span style="font-size:5rem">📩</span>
+            <h2>Hotovo!</h2>
+            <span class="highlight">Platební údaje a fakturu jsme vám odeslali do e-mailu.</span>
+            <p>Jakmile platba dorazí, začínáme tisknout.</p>
         </div>
-        <p style="text-align:center; margin-top:20px;">
-            <a id="invoice-link" href="#" target="_blank" style="color:var(--primary); font-weight:700; text-decoration: none;">📄 Stáhnout fakturu (PDF)</a>
-        </p>
+        <button onclick="window.location.href='index.html'" style="background:#f1f5f9; color:#0f172a; margin-top:30px;">ZAVŘÍT</button>
     </div>
 </div>
 
@@ -94,77 +95,67 @@
     let shipPrice = 0;
     let shipName = "";
 
-    // Načtení dat hned po startu
-    async function init() {
+    // Funkce pro načtení dat
+    async function loadOrder() {
         if (!orderId) {
-            alert("Chybí ID objednávky v adrese!");
+            alert("V adrese chybí ID objednávky! (např. ?id=...)");
             return;
         }
         try {
             const snap = await getDoc(doc(db, "objednavky", orderId));
             if (snap.exists()) {
                 orderData = snap.data();
-                console.log("Data načtena:", orderData);
+                console.log("Data načtena úspěšně:", orderData);
             } else {
-                alert("Objednávka nenalezena!");
+                alert("Objednávka s ID " + orderId + " neexistuje v databázi.");
             }
         } catch (e) {
             console.error("Chyba Firebase:", e);
+            alert("Nepodařilo se spojit s databází. Zkontrolujte připojení.");
         }
     }
-    init();
+    loadOrder();
 
-    // Funkce pro přepínání kroků
-    window.showStep = (n) => {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step-' + n).classList.add('active');
-        window.scrollTo(0,0);
-    };
+    window.addEventListener("message", function (event) {
+        if (event.data.message === "pickerResult") {
+            const point = event.data.point;
+            shipPrice = 75;
+            shipName = "Balíkovna: " + point.name + " (" + point.address + ")";
+            document.getElementById('ship-info').style.display = 'block';
+            document.getElementById('ship-info').innerText = "Vybráno: " + shipName;
+            document.getElementById('confirm-btn').classList.remove('hidden');
+            closeBalikovna();
+        }
+    });
+
+    window.openBalikovna = () => { document.getElementById('balikovna-modal').style.display = 'block'; document.body.style.overflow = 'hidden'; };
+    window.closeBalikovna = () => { document.getElementById('balikovna-modal').style.display = 'none'; document.body.style.overflow = 'auto'; };
+    window.showStep = (n) => { document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); document.getElementById('step-' + n).classList.add('active'); };
 
     window.goToStep2 = () => {
-        const jmeno = document.getElementById('c-jmeno').value;
-        if (jmeno.length < 3) {
-            alert("Prosím vyplňte jméno.");
+        if (!orderData) {
+            // Pokud se data nenačetla na začátku, zkusíme to ještě jednou teď
+            loadOrder().then(() => {
+                if (orderData) window.showStep(2);
+                else alert("Data objednávky stále nejsou načtena. Zkontrolujte ID.");
+            });
             return;
         }
+        if (document.getElementById('c-jmeno').value.length < 3) return alert("Vyplňte jméno.");
         window.showStep(2);
     };
 
-    // Firma checkbox
-    document.getElementById('c-is-comp').addEventListener('change', (e) => {
-        document.getElementById('comp-area').classList.toggle('hidden', !e.target.checked);
-    });
-
-    // Zásilkovna
-    window.pickPacketa = () => {
-        Packeta.Widget.pick("c93547849e77864c", (p) => {
-            if (p) {
-                shipPrice = 79;
-                shipName = "Zásilkovna: " + p.name;
-                document.getElementById('ship-info').innerText = shipName + " (79 Kč)";
-                document.getElementById('confirm-btn').classList.remove('hidden');
-            }
-        });
-    };
-
-    // Jiná doprava
     window.setShip = (price, name) => {
-        shipPrice = price;
-        shipName = name;
-        document.getElementById('ship-info').innerText = shipName + " (" + price + " Kč)";
+        shipPrice = price; shipName = name;
+        document.getElementById('ship-info').style.display = 'block';
+        document.getElementById('ship-info').innerText = "Vybráno: " + shipName + " (" + price + " Kč)";
         document.getElementById('confirm-btn').classList.remove('hidden');
     };
 
-    // FINÁLNÍ POTVRZENÍ
     window.finishOrder = async () => {
-        if (!orderData) return alert("Chyba dat.");
-        
+        if (!orderData) return alert("Chyba: Data nebyla načtena.");
         const total = (orderData.cena || 0) + shipPrice;
-        // Variabilní symbol vytvoříme z ID objednávky (jen čísla)
-        const vs = orderId.replace(/\D/g,'').substring(0,10) || "123456";
-        
         try {
-            // 1. Update ve Firebase
             await updateDoc(doc(db, "objednavky", orderId), {
                 stav: "čeka na platbu",
                 cena_celkem: total,
@@ -172,8 +163,6 @@
                 zakaznik_full: document.getElementById('c-jmeno').value,
                 adresa_fakturace: `${document.getElementById('c-ulice').value}, ${document.getElementById('c-mesto').value}, ${document.getElementById('c-psc').value}`
             });
-
-            // 2. Odeslání potvrzovacího e-mailu přes Worker
             fetch(workerUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -186,19 +175,8 @@
                     invoiceUrl: orderData.invoiceUrl
                 })
             });
-
-            // 3. Zobrazení výsledku
-            document.getElementById('final-price').innerText = total + " Kč";
-            document.getElementById('final-vs').innerText = vs;
-            document.getElementById('invoice-link').href = orderData.invoiceUrl;
-            
-            const qrImg = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=2502263445&bankCode=2010&amount=${total}&currency=CZK&vs=${vs}`;
-            document.getElementById('qr-code').innerHTML = `<img src="${qrImg}" width="220" style="border-radius:10px;">`;
-            
             window.showStep(3);
-        } catch (e) {
-            alert("Chyba při ukládání: " + e.message);
-        }
+        } catch (e) { alert("Chyba při ukládání do Firebase."); }
     };
 </script>
 </body>
