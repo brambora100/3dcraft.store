@@ -65,12 +65,12 @@
 
     <div id="step-3" class="step">
         <div style="text-align: center;">
-            <span style="font-size:5rem">📩</span>
-            <h2>Hotovo!</h2>
-            <span class="highlight">Platební údaje a fakturu jsme vám odeslali do e-mailu.</span>
-            <p>Jakmile platba dorazí, začínáme tisknout.</p>
+            <span style="font-size:5rem">✅</span>
+            <h2>Uloženo!</h2>
+            <span class="highlight">Vaše údaje byly úspěšně uloženy k zakázce.</span>
+            <p>Admin nyní uvidí vaši adresu a zvolenou dopravu.</p>
         </div>
-        <button onclick="window.location.href='index.html'" style="background:#f1f5f9; color:#0f172a; margin-top:30px;">ZAVŘÍT</button>
+        <button onclick="window.close()" style="background:#f1f5f9; color:#0f172a; margin-top:30px;">ZAVŘÍT</button>
     </div>
 </div>
 
@@ -87,7 +87,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const workerUrl = "https://test.bilcusadam.workers.dev/";
     
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
@@ -95,23 +94,20 @@
     let shipPrice = 0;
     let shipName = "";
 
-    // Funkce pro načtení dat
     async function loadOrder() {
         if (!orderId) {
-            alert("V adrese chybí ID objednávky! (např. ?id=...)");
+            alert("Chybí ID v URL!");
             return;
         }
         try {
             const snap = await getDoc(doc(db, "objednavky", orderId));
             if (snap.exists()) {
                 orderData = snap.data();
-                console.log("Data načtena úspěšně:", orderData);
             } else {
-                alert("Objednávka s ID " + orderId + " neexistuje v databázi.");
+                alert("Objednávka nenalezena.");
             }
         } catch (e) {
-            console.error("Chyba Firebase:", e);
-            alert("Nepodařilo se spojit s databází. Zkontrolujte připojení.");
+            console.error(e);
         }
     }
     loadOrder();
@@ -133,14 +129,6 @@
     window.showStep = (n) => { document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); document.getElementById('step-' + n).classList.add('active'); };
 
     window.goToStep2 = () => {
-        if (!orderData) {
-            // Pokud se data nenačetla na začátku, zkusíme to ještě jednou teď
-            loadOrder().then(() => {
-                if (orderData) window.showStep(2);
-                else alert("Data objednávky stále nejsou načtena. Zkontrolujte ID.");
-            });
-            return;
-        }
         if (document.getElementById('c-jmeno').value.length < 3) return alert("Vyplňte jméno.");
         window.showStep(2);
     };
@@ -153,30 +141,25 @@
     };
 
     window.finishOrder = async () => {
-        if (!orderData) return alert("Chyba: Data nebyla načtena.");
+        if (!orderData) return alert("Chyba načítání dat.");
+        
+        // Vypočítáme novou celkovou cenu
         const total = (orderData.cena || 0) + shipPrice;
+        
         try {
+            // Pouze aktualizujeme Firebase - žádný e-mail se neposílá
             await updateDoc(doc(db, "objednavky", orderId), {
-                stav: "čeka na platbu",
-                cena_celkem: total,
-                doprava_info: shipName,
-                zakaznik_full: document.getElementById('c-jmeno').value,
-                adresa_fakturace: `${document.getElementById('c-ulice').value}, ${document.getElementById('c-mesto').value}, ${document.getElementById('c-psc').value}`
+                cena: total, // Aktualizace celkové ceny včetně dopravy
+                shipAddress: shipName, // Pole, které váš admin panel čte pro dopravu
+                zakaznik: document.getElementById('c-jmeno').value,
+                fakturacniAdresa: `${document.getElementById('c-ulice').value}, ${document.getElementById('c-mesto').value}, ${document.getElementById('c-psc').value}`
             });
-            fetch(workerUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "send_specific_mail",
-                    mailType: "faktura_k_platbe",
-                    email: orderData.email,
-                    nazev: orderData.nazev,
-                    total: total,
-                    invoiceUrl: orderData.invoiceUrl
-                })
-            });
+            
             window.showStep(3);
-        } catch (e) { alert("Chyba při ukládání do Firebase."); }
+        } catch (e) { 
+            console.error(e);
+            alert("Chyba při ukládání."); 
+        }
     };
 </script>
 </body>
